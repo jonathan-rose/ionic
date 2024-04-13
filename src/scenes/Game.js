@@ -11,10 +11,9 @@ export class Game extends Scene
 
     create ()
     {
-        this.cameras.main.setBackgroundColor(0x000000);
-
-        this.player = new Player(this, 200, 200, 'player');
-        this.shield = new Shield(this, 300, 300);
+        this.cameras.main.setBackgroundColor(0xffffff);
+        this.shield = new Shield(this, this.game.config.width / 2, this.game.config.width / 2);
+        this.player = new Player(this, this.shield.x, this.shield.y - this.shield.height, 'player');
     }
 
     update () {

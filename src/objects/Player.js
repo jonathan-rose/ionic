@@ -11,7 +11,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.add.existing(this);
     }
 
-    setLocation(x, y) {
+        setLocation(x, y) {
         this.x = x;
         this.y = y;
     }

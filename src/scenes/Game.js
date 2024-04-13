@@ -1,4 +1,6 @@
 import { Scene } from 'phaser';
+import Player from '../objects/Player';
+import Shield from '../objects/Shield';
 
 export class Game extends Scene
 {
@@ -9,20 +11,13 @@ export class Game extends Scene
 
     create ()
     {
-        this.cameras.main.setBackgroundColor(0x00ff00);
+        this.cameras.main.setBackgroundColor(0x000000);
 
-        this.add.image(512, 384, 'background').setAlpha(0.5);
+        this.player = new Player(this, 200, 200, 'player');
+        this.shield = new Shield(this, 300, 300);
+    }
 
-        this.add.text(512, 384, 'Make something fun!\nand share it with us:\nsupport@phaser.io', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setOrigin(0.5);
+    update () {
 
-        this.input.once('pointerdown', () => {
-
-            this.scene.start('GameOver');
-
-        });
     }
 }

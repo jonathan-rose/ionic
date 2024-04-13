@@ -1,10 +1,9 @@
 import { Scene } from 'phaser';
 
-var keys;
 var rectangle;
 var graphics;
-var coolometerCount;
-var coolometerMax;
+var powerbarCount;
+var powerbarMax;
 
 export class Game extends Scene
 {
@@ -19,48 +18,48 @@ export class Game extends Scene
 
         this.add.image(512, 384, 'background').setAlpha(0.5);
 
-        this.coolometerBackground = this.add.image(725, 300, 'powerbar-background');
-        this.coolometerForeground = this.add.image(725, 300, 'powerbar-foreground');
-        this.coolometerForeground.setDepth(3);
+        this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
+        this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
+        this.powerbarForeground.setDepth(3);
 
-        this.addCoolometer();
+        this.addPowerbar();
     }
 
     update () {
-        if (coolometerCount < coolometerMax){
-            coolometerCount = Math.min(coolometerMax, coolometerCount + 0.6);
+        if (powerbarCount < powerbarMax){
+            powerbarCount = Math.min(powerbarMax, powerbarCount + 0.6);
         }
-        else if (coolometerCount > 0){
-            coolometerCount = Math.max(0, coolometerCount - 3);
+        else if (powerbarCount > 0){
+            powerbarCount = Math.max(0, powerbarCount - 3);
         }
 
          // update coolometer
         graphics.clear();
-        rectangle.setSize(100, coolometerCount);
-        rectangle.y = 600 - coolometerCount;
+        rectangle.setSize(this.powerbarForeground.width, powerbarCount);
+        rectangle.y = this.powerbarForeground.getBottomLeft().y - powerbarCount;
         graphics.fillRectShape(rectangle);
     }
 
-    addCoolometer() {
+    addPowerbar() {
         graphics = this.add.graphics({ fillStyle: { color: 0x00ffff }});
         rectangle = new Phaser.Geom.Rectangle(
-            this.coolometerForeground.getTopLeft().x,
-            this.coolometerForeground.getTopLeft().y,
-            this.coolometerForeground.width,
-            this.coolometerForeground.height
+            this.powerbarForeground.getTopLeft().x,
+            this.powerbarForeground.getTopLeft().y,
+            this.powerbarForeground.width,
+            this.powerbarForeground.height
             );
-        coolometerCount = 0;
-        coolometerMax = 600;
+        powerbarCount = 0;
+        powerbarMax = 600;
 
         const shape = this.make.graphics();
         shape.fillStyle(0xffffff);
         shape.beginPath();
         shape.fillRoundedRect(
-            rectangle.x + 2,
-            rectangle.y + 8,
-            rectangle.width - 4,
-            rectangle.height - 16,
-            45
+            rectangle.x,
+            rectangle.y,
+            rectangle.width,
+            rectangle.height,
+            this.powerbarForeground.width/2
         );
 
         const mask = shape.createGeometryMask();

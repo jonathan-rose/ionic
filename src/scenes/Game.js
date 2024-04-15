@@ -9,6 +9,7 @@ var graphicsHealthbar;
 var rectangleHealthbar;
 var healthbarCurrent;
 var healthbarMax;
+var enemies;
 
 export class Game extends Scene
 {
@@ -22,6 +23,7 @@ export class Game extends Scene
         this.cameras.main.setBackgroundColor(0x00ff00);
 
         this.add.image(512, 384, 'background').setAlpha(0.5);
+        this.core = this.physics.add.image(512, 384, 'core');
 
         this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
         this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
@@ -62,6 +64,9 @@ export class Game extends Scene
 
         this.makeShapeMask(rectangleHealthbar, graphicsHealthbar)
 
+        // Add enemies
+        enemies = this.add.group();
+
     }
 
     update () {
@@ -77,6 +82,11 @@ export class Game extends Scene
         }
         if (Phaser.Input.Keyboard.JustDown(keys.enter)) {
             powerbarCurrent = Math.max(0, powerbarCurrent - 100);
+        }
+
+        if (powerbarCurrent < 500)
+        {
+            this.addEnemy();
         }
 
 
@@ -106,5 +116,18 @@ export class Game extends Scene
         );
         const mask = shape.createGeometryMask();
         graphicsType.setMask(mask);
+    }
+
+    addEnemy(){
+        var enemy = this.physics.add.sprite(
+            Phaser.Math.Between(0, 700), 
+            Phaser.Math.Between(0, 500), 
+            'enemy'
+            );
+
+        this.physics.moveToObject(enemy, this.core, 100);
+
+        enemies.add(enemy);
+
     }
 }

@@ -24,20 +24,6 @@ export class Game extends Scene
         this.cameras.main.setBackgroundColor(0x000000);
 
         this.plasmaField = new PlasmaField(this);
-
-        this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
-        this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
-        this.powerbarForeground.setDepth(3);
-
-        this.healthbarBackground = this.add.image(850, 400, 'powerbar-background');
-        this.healthbarForeground = this.add.image(850, 400, 'powerbar-foreground');
-        this.healthbarForeground.setDepth(3);
-
-        keys = this.input.keyboard.addKeys({
-            'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
-            'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
-        });
-
         this.isFiring = false;
 
         this.input.on('pointerdown', () => {
@@ -60,6 +46,21 @@ export class Game extends Scene
                 this.plasmaField.stopFiring();
                 this.isFiring = false;
             }
+        });
+
+        this.core = this.add.image(512, 384, 'core');
+
+        this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
+        this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
+        this.powerbarForeground.setDepth(3);
+
+        this.healthbarBackground = this.add.image(850, 400, 'powerbar-background');
+        this.healthbarForeground = this.add.image(850, 400, 'powerbar-foreground');
+        this.healthbarForeground.setDepth(3);
+
+        keys = this.input.keyboard.addKeys({
+            'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
+            'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
         });
 
         // Add power bar

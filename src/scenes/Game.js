@@ -20,8 +20,6 @@ export class Game extends Scene
             this.game.config.height / 2
         );
 
-        console.log(this.shield);
-
         this.player = new Player(
             this, 
             this.shield.x,
@@ -29,8 +27,6 @@ export class Game extends Scene
             'player',
             this.shield.height / 2
         );
-
-        console.log(this.player);
 
     }
 

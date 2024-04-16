@@ -18,6 +18,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     update (time, delta) {
         this.x = this.center.x + this.radius * Math.cos(Phaser.Math.DegToRad(this.currentAngle));
         this.y = this.center.y + this.radius * Math.sin(Phaser.Math.DegToRad(this.currentAngle));
+        this.rotation = Phaser.Math.DegToRad(this.currentAngle) - Math.PI / 2;
     }
 
         setLocation(x, y) {

@@ -46,7 +46,7 @@ export class Game extends Scene
             }
         });
 
-        this.core = this.physics.add.image(512, 384, 'core');
+        this.core = this.physics.add.staticImage(512, 384, 'core').setCircle(71);
 
         this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
         this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
@@ -68,7 +68,7 @@ export class Game extends Scene
             this.powerbarForeground.getTopLeft().y,
             this.powerbarForeground.width,
             this.powerbarForeground.height
-            );
+        );
         powerbarCurrent = 600;
         powerbarMax = 600;
 
@@ -81,18 +81,17 @@ export class Game extends Scene
             this.healthbarForeground.getTopLeft().y,
             this.healthbarForeground.width,
             this.healthbarForeground.height
-            );
+        );
         healthbarCurrent = 600;
         healthbarMax = 600;
 
-        this.makeShapeMask(rectangleHealthbar, graphicsHealthbar)
+        this.makeShapeMask(rectangleHealthbar, graphicsHealthbar);
 
         this.enemies = this.physics.add.group();
 
-        this.shieldSurface = this.physics.add.image('blank200').setCircle(100);
+        this.shieldSurface = this.physics.add.staticImage(512 - 100, 384 - 100, 'blank200').setCircle(200);
 
-        this.physics.add.collider(this.core, this.enemies, this.hitShield, null, this);
-
+        this.physics.add.overlap(this.shieldSurface, this.enemies, this.hitShield, null, this);
     }
 
     update () {
@@ -115,7 +114,7 @@ export class Game extends Scene
 	this.plasmaField.update();
         this.plasmaField.draw();
 
-         // update powerbar and healthbar
+        // update powerbar and healthbar
         graphicsPowerbar.clear();
         rectanglePowerbar.setSize(this.powerbarForeground.width, powerbarCurrent);
         rectanglePowerbar.y = this.powerbarForeground.getBottomLeft().y - powerbarCurrent;
@@ -151,7 +150,7 @@ export class Game extends Scene
             this.randomCirclePos.x, 
             this.randomCirclePos.y, 
             'enemy'
-            );
+        );
 
         this.enemies.add(enemy);
         this.physics.moveToObject(enemy, this.core, 100);

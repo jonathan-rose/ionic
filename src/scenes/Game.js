@@ -29,7 +29,6 @@ export class Game extends Scene
         this.input.on('pointerdown', () => {
 
             if (!this.isFiring) {
-                console.log("firing");
                 this.plasmaField.startFiring(
                     Phaser.Math.RadToDeg(
                         Phaser.Math.Angle.Between(
@@ -42,13 +41,12 @@ export class Game extends Scene
                 );
                 this.isFiring = true;
             } else {
-                console.log("stopping");
                 this.plasmaField.stopFiring();
                 this.isFiring = false;
             }
         });
 
-        this.core = this.add.image(512, 384, 'core');
+//        this.core = this.add.image(512, 384, 'core');
 
         this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
         this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');

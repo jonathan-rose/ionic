@@ -46,7 +46,7 @@ export class Game extends Scene
             }
         });
 
-        this.core = this.add.image(512, 384, 'core');
+//        this.core = this.add.image(512, 384, 'core');
 
         this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
         this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');

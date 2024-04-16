@@ -70,6 +70,13 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         this.graphics.arc(512, 383, this.shieldRadius * 0.96, 0, Phaser.Math.DegToRad(360));
         this.graphics.closePath();
         this.graphics.strokePath();
+
+        // inner ring
+        this.graphics.lineStyle(3, 0xE54489, 1);
+        this.graphics.beginPath();
+        this.graphics.arc(512, 383, 40, 0, Phaser.Math.DegToRad(360));
+        this.graphics.closePath();
+        this.graphics.strokePath();
     }
 
     drawGradientCurve(curve, color, thickness, reversed = false) {

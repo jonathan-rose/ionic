@@ -18,7 +18,7 @@ export default class Tendril {
         this.scene = scene;
         this.curve = [];
         this.radius = radius;
-        this.innerRadius = 65;
+        this.innerRadius = 40;
         this.rotation = Util.randBetween(0, 360);
         this.rotationSpeed = Util.randNth([-0.5, 0.5]);
         this.p1rotationOffset = -20;

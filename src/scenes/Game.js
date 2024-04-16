@@ -10,6 +10,7 @@ var graphicsHealthbar;
 var rectangleHealthbar;
 var healthbarCurrent;
 var healthbarMax;
+var enemies;
 
 export class Game extends Scene
 {
@@ -23,20 +24,6 @@ export class Game extends Scene
         this.cameras.main.setBackgroundColor(0x000000);
 
         this.plasmaField = new PlasmaField(this);
-
-        this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
-        this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
-        this.powerbarForeground.setDepth(3);
-
-        this.healthbarBackground = this.add.image(850, 400, 'powerbar-background');
-        this.healthbarForeground = this.add.image(850, 400, 'powerbar-foreground');
-        this.healthbarForeground.setDepth(3);
-
-        keys = this.input.keyboard.addKeys({
-            'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
-            'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
-        });
-
         this.isFiring = false;
 
         this.input.on('pointerdown', () => {
@@ -59,6 +46,21 @@ export class Game extends Scene
                 this.plasmaField.stopFiring();
                 this.isFiring = false;
             }
+        });
+
+        this.core = this.add.image(512, 384, 'core');
+
+        this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
+        this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
+        this.powerbarForeground.setDepth(3);
+
+        this.healthbarBackground = this.add.image(850, 400, 'powerbar-background');
+        this.healthbarForeground = this.add.image(850, 400, 'powerbar-foreground');
+        this.healthbarForeground.setDepth(3);
+
+        keys = this.input.keyboard.addKeys({
+            'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
+            'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
         });
 
         // Add power bar
@@ -87,6 +89,9 @@ export class Game extends Scene
 
         this.makeShapeMask(rectangleHealthbar, graphicsHealthbar)
 
+        // Add enemies
+        enemies = this.add.group();
+
     }
 
     update () {
@@ -103,6 +108,14 @@ export class Game extends Scene
         if (Phaser.Input.Keyboard.JustDown(keys.enter)) {
             powerbarCurrent = Math.max(0, powerbarCurrent - 100);
         }
+
+        if (powerbarCurrent < 500)
+        {
+            this.addEnemy();
+        }
+
+	this.plasmaField.update();
+        this.plasmaField.draw();
 
 
          // update powerbar and healthbar
@@ -133,8 +146,16 @@ export class Game extends Scene
         graphicsType.setMask(mask);
     }
 
-    update() {
-        this.plasmaField.update();
-        this.plasmaField.draw();
+    addEnemy(){
+        var enemy = this.physics.add.sprite(
+            Phaser.Math.Between(0, 700), 
+            Phaser.Math.Between(0, 500), 
+            'enemy'
+            );
+
+        this.physics.moveToObject(enemy, this.core, 100);
+
+        enemies.add(enemy);
+
     }
 }

@@ -37,6 +37,7 @@ export class Preloader extends Scene
         this.load.image('powerbar-foreground', 'barForeground.png');
         this.load.image('enemy', 'enemy.png');
         this.load.image('core', 'tempPlanet.png');
+        this.load.image('blank200', 'empty200x200.png');
     }
 
     create ()

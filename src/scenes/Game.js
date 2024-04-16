@@ -11,7 +11,6 @@ var graphicsHealthbar;
 var rectangleHealthbar;
 var healthbarCurrent;
 var healthbarMax;
-var enemies;
 
 export class Game extends Scene
 {
@@ -49,14 +48,14 @@ export class Game extends Scene
             }
         });
 
-        this.core = this.add.image(512, 384, 'core');
+        this.core = this.physics.add.image(512, 384, 'core');
 
         this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
         this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
         this.powerbarForeground.setDepth(3);
 
-        this.healthbarBackground = this.add.image(850, 400, 'powerbar-background');
-        this.healthbarForeground = this.add.image(850, 400, 'powerbar-foreground');
+        this.healthbarBackground = this.add.image(75, 400, 'powerbar-background');
+        this.healthbarForeground = this.add.image(75, 400, 'powerbar-foreground');
         this.healthbarForeground.setDepth(3);
 
         keys = this.input.keyboard.addKeys({
@@ -90,8 +89,11 @@ export class Game extends Scene
 
         this.makeShapeMask(rectangleHealthbar, graphicsHealthbar)
 
-        // Add enemies
-        enemies = this.add.group();
+        this.enemies = this.physics.add.group();
+
+        this.shieldSurface = this.physics.add.image('blank200').setCircle(100);
+
+        this.physics.add.collider(this.core, this.enemies, this.hitShield, null, this);
 
     }
 
@@ -110,14 +112,10 @@ export class Game extends Scene
             powerbarCurrent = Math.max(0, powerbarCurrent - 100);
         }
 
-        if (powerbarCurrent < 500)
-        {
-            this.addEnemy();
-        }
+        this.addEnemy();
 
 	    this.plasmaField.update();
         this.plasmaField.draw();
-
 
          // update powerbar and healthbar
         graphicsPowerbar.clear();
@@ -129,6 +127,7 @@ export class Game extends Scene
         rectangleHealthbar.setSize(this.healthbarForeground.width, healthbarCurrent);
         rectangleHealthbar.y = this.healthbarForeground.getBottomLeft().y - healthbarCurrent;
         graphicsHealthbar.fillRectShape(rectangleHealthbar);
+        //console.log(enemies);
     }
 
     makeShapeMask(rectangleBarType, graphicsType)
@@ -157,9 +156,12 @@ export class Game extends Scene
             'enemy'
             );
 
+        this.enemies.add(enemy);
         this.physics.moveToObject(enemy, this.core, 100);
+    }
 
-        enemies.add(enemy);
-
+    hitShield(shield, enemy){
+        console.log('got hit');
+        enemy.destroy();
     }
 }

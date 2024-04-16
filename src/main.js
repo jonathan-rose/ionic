@@ -17,7 +17,10 @@ const config = {
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
     physics: {
-        default: 'arcade'
+        default: 'arcade',
+        arcade: {
+            debug: false
+        }
     },
     scene: [
         Boot,

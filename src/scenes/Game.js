@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import PlasmaField from '../objects/PlasmaField';
+import Util from '../util.js';
 
 var keys;
 var rectanglePowerbar;
@@ -114,7 +115,7 @@ export class Game extends Scene
             this.addEnemy();
         }
 
-	this.plasmaField.update();
+	    this.plasmaField.update();
         this.plasmaField.draw();
 
 
@@ -147,9 +148,12 @@ export class Game extends Scene
     }
 
     addEnemy(){
+        this.start = new Phaser.Math.Vector2(512, 384);
+        this.rotation = Util.randBetween(0, 360);
+        this.randomCirclePos = Util.offsetByTrig(this.start, this.rotation, 700); //start, angle, distance
         var enemy = this.physics.add.sprite(
-            Phaser.Math.Between(0, 700), 
-            Phaser.Math.Between(0, 500), 
+            this.randomCirclePos.x, 
+            this.randomCirclePos.y, 
             'enemy'
             );
 

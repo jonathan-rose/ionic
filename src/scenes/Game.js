@@ -29,7 +29,6 @@ export class Game extends Scene
         this.input.on('pointerdown', () => {
 
             if (!this.isFiring) {
-                console.log("firing");
                 this.plasmaField.startFiring(
                     Phaser.Math.RadToDeg(
                         Phaser.Math.Angle.Between(
@@ -42,7 +41,6 @@ export class Game extends Scene
                 );
                 this.isFiring = true;
             } else {
-                console.log("stopping");
                 this.plasmaField.stopFiring();
                 this.isFiring = false;
             }
@@ -114,7 +112,7 @@ export class Game extends Scene
 
         this.addEnemy();
 
-	    this.plasmaField.update();
+	this.plasmaField.update();
         this.plasmaField.draw();
 
          // update powerbar and healthbar
@@ -127,7 +125,6 @@ export class Game extends Scene
         rectangleHealthbar.setSize(this.healthbarForeground.width, healthbarCurrent);
         rectangleHealthbar.y = this.healthbarForeground.getBottomLeft().y - healthbarCurrent;
         graphicsHealthbar.fillRectShape(rectangleHealthbar);
-        //console.log(enemies);
     }
 
     makeShapeMask(rectangleBarType, graphicsType)

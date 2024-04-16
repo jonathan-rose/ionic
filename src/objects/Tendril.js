@@ -14,10 +14,11 @@ import Util from '../util';
 
 export default class Tendril {
 
-    constructor (scene) {
+    constructor (scene, radius) {
         this.scene = scene;
         this.curve = [];
-        this.radius = 300;
+        this.radius = radius;
+        this.innerRadius = 40;
         this.rotation = Util.randBetween(0, 360);
         this.rotationSpeed = Util.randNth([-0.5, 0.5]);
         this.p1rotationOffset = -20;
@@ -25,9 +26,7 @@ export default class Tendril {
         this.p1radiusMultiplier = 0.8;
         this.p2radiusMultiplier = 0.6;
 
-        this.start = new Phaser.Math.Vector2(512, 384);
         this.recalculateCurve();
-
         this.addTweens();
     }
 
@@ -37,11 +36,12 @@ export default class Tendril {
     }
 
     recalculateCurve() {
-        this.end = Util.offsetByTrig(this.start, this.rotation, this.radius);
+        this.start = Util.offsetByTrig(new Phaser.Math.Vector2(512, 384), this.rotation, this.innerRadius);
+        this.end = Util.offsetByTrig(this.start, this.rotation, (this.radius - this.innerRadius));
         this.p1rotation = this.rotation + this.p1rotationOffset;
         this.p2rotation = this.rotation + this.p2rotationOffset;
-        this.p1radius = this.radius * this.p1radiusMultiplier;
-        this.p2radius = this.radius * this.p2radiusMultiplier;
+        this.p1radius = (this.radius - this.innerRadius) * this.p1radiusMultiplier;
+        this.p2radius = (this.radius - this.innerRadius) * this.p2radiusMultiplier;
         
         this.curve = new Phaser.Curves.CubicBezier(
             this.start,

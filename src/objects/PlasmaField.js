@@ -16,11 +16,12 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         super(scene);
         this.scene = scene;
         this.graphics = this.scene.add.graphics();
+        this.shieldRadius = 200;
         this.isFiring = false;
 
         this.tendrils = [];
         for (let i = 0; i < 30; i++) {
-            this.tendrils.push(new Tendril(this.scene));
+            this.tendrils.push(new Tendril(this.scene, this.shieldRadius));
         }
     }
 
@@ -44,10 +45,10 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
 
     drawTendrils() {
         this.tendrils.forEach((t) => {
-            this.drawGradientCurve(t.curve, 0xE54489, 20);
-            this.drawGradientCurve(t.curve, 0xE54489, 20, true);
+            this.drawGradientCurve(t.curve, 0xE54489, 18);
+            this.drawGradientCurve(t.curve, 0xE54489, 18, true);
 
-            this.graphics.lineStyle(10, 0x3335D7, 1);
+            this.graphics.lineStyle(8, 0x3335D7, 1);
             t.curve.draw(this.graphics);
 
             this.graphics.lineStyle(2, 0xffffff, 1);
@@ -59,14 +60,14 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         // black ring to cut off the end of the tendrils
         this.graphics.lineStyle(20, 0x0, 1);
         this.graphics.beginPath();
-        this.graphics.arc(512, 383, 302, 0, Phaser.Math.DegToRad(360));
+        this.graphics.arc(512, 383, this.shieldRadius * 1.007, 0, Phaser.Math.DegToRad(360));
         this.graphics.closePath();
         this.graphics.strokePath();
 
         // draw the shield as a pink ring
-        this.graphics.lineStyle(2, 0xE54489, 1);
+        this.graphics.lineStyle(3, 0xE54489, 1);
         this.graphics.beginPath();
-        this.graphics.arc(512, 383, 293, 0, Phaser.Math.DegToRad(360));
+        this.graphics.arc(512, 383, this.shieldRadius * 0.96, 0, Phaser.Math.DegToRad(360));
         this.graphics.closePath();
         this.graphics.strokePath();
     }
@@ -91,7 +92,6 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         }
     }
 
-    // @TODO: when we do this we should check which direction the tendril should travel
     // @TODO: we should make the wiggles straighter when firing so the tendrils will easily fit through our cannon aperture.
     startFiring(angle) {
         this.tendrils.forEach((t) => {
@@ -99,9 +99,16 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
             t.previousRotationSpeed = t.rotationSpeed;
             t.rotationSpeed = 0;
             t.rotationSpeedTween.pause();
+
+            // Try and make sure the tendrils choose the shortest direction
+            let target = angle;
+            if (angle - t.rotation < -180) {
+                target = angle + 360;
+            }
+
             this.scene.tweens.add({
                 targets: t,
-                rotation: angle,
+                rotation: target,
                 duration: 300,
                 onComplete: (tween, targets, field) => {
                     field.isFiring = true;
@@ -116,7 +123,7 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
     stopFiring() {
         this.isFiring = false;
         this.tendrils.forEach((t) => {
-            t.radius = 300;
+            t.radius = this.shieldRadius;
             this.scene.tweens.add({
                 targets: t,
                 rotation: t.previousRotation,

@@ -22,7 +22,13 @@ const config = {
         MainMenu,
         Game,
         GameOver
-    ]
+    ],
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: true
+        }
+    }
 };
 
 export default new Phaser.Game(config);

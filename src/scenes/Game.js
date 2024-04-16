@@ -12,11 +12,35 @@ export class Game extends Scene
     create ()
     {
         this.cameras.main.setBackgroundColor(0xffffff);
-        this.shield = new Shield(this, this.game.config.width / 2, this.game.config.width / 2);
-        this.player = new Player(this, this.shield.x, this.shield.y - this.shield.height, 'player');
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        this.shield = new Shield(
+            this, 
+            this.game.config.width / 2, 
+            this.game.config.height / 2
+        );
+
+        console.log(this.shield);
+
+        this.player = new Player(
+            this, 
+            this.shield.x,
+            this.shield.y, 
+            'player',
+            this.shield.height / 2
+        );
+
+        console.log(this.player);
+
     }
 
-    update () {
+    update (time, delta) {
+        if (this.cursors.left.isDown) {
+            this.player.currentAngle -= 2;
+        } else if (this.cursors.right.isDown) {
+            this.player.currentAngle += 2;
+        }
 
+        this.player.update(time. delta);
     }
 }

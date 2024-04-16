@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import PlasmaField from '../objects/PlasmaField';
 
 var keys;
 var rectanglePowerbar;
@@ -20,10 +21,9 @@ export class Game extends Scene
 
     create ()
     {
-        this.cameras.main.setBackgroundColor(0x00ff00);
+        this.cameras.main.setBackgroundColor(0x000000);
 
-        this.add.image(512, 384, 'background').setAlpha(0.5);
-        this.core = this.physics.add.image(512, 384, 'core');
+        this.plasmaField = new PlasmaField(this);
 
         this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
         this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
@@ -36,6 +36,30 @@ export class Game extends Scene
         keys = this.input.keyboard.addKeys({
             'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
             'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
+        });
+
+        this.isFiring = false;
+
+        this.input.on('pointerdown', () => {
+
+            if (!this.isFiring) {
+                console.log("firing");
+                this.plasmaField.startFiring(
+                    Phaser.Math.RadToDeg(
+                        Phaser.Math.Angle.Between(
+                            512,
+                            383,
+                            this.input.mousePointer.x,
+                            this.input.mousePointer.y
+                        )
+                    )
+                );
+                this.isFiring = true;
+            } else {
+                console.log("stopping");
+                this.plasmaField.stopFiring();
+                this.isFiring = false;
+            }
         });
 
         // Add power bar
@@ -88,6 +112,9 @@ export class Game extends Scene
         {
             this.addEnemy();
         }
+
+	this.plasmaField.update();
+        this.plasmaField.draw();
 
 
          // update powerbar and healthbar

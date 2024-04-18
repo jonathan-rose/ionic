@@ -96,6 +96,7 @@ export class Game extends Scene
     }
 
     update () {
+        // Currently constantly increases power and health
         if (powerbarCurrent < powerbarMax){
             powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 5);
         }
@@ -103,11 +104,8 @@ export class Game extends Scene
             healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 5);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(keys.space)) {
-            healthbarCurrent = Math.max(0, healthbarCurrent - 100);
-        }
-        if (Phaser.Input.Keyboard.JustDown(keys.enter)) {
-            powerbarCurrent = Math.max(0, powerbarCurrent - 100);
+        if (this.isFiring) {
+            powerbarCurrent = Math.max(0, powerbarCurrent - 10);
         }
 
         this.addEnemy();
@@ -152,6 +150,7 @@ export class Game extends Scene
             this.randomCirclePos.y, 
             'enemy'
         );
+        enemy.setDepth(1);
 
         // rotate to face centre
         const angleDeg = Math.atan2(this.randomCirclePos.y - this.core.y, this.randomCirclePos.x - this.core.x) * 180 / Math.PI;
@@ -163,5 +162,6 @@ export class Game extends Scene
 
     hitShield(shield, enemy){
         enemy.destroy();
+        healthbarCurrent = Math.max(0, healthbarCurrent - 10);
     }
 }

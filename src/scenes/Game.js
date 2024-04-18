@@ -21,7 +21,8 @@ export class Game extends Scene
 
     create ()
     {
-        this.cameras.main.setBackgroundColor(0x000000);
+        //this.cameras.main.setBackgroundColor(0x000000);
+        this.add.image(512, 384, 'background');
 
         this.plasmaField = new PlasmaField(this);
         this.isFiring = false;
@@ -46,7 +47,7 @@ export class Game extends Scene
             }
         });
 
-        this.core = this.physics.add.staticImage(512, 384, 'core').setCircle(71);
+        this.core = this.physics.add.staticImage(512, 384, 'station');
 
         this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
         this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
@@ -111,7 +112,7 @@ export class Game extends Scene
 
         this.addEnemy();
 
-	this.plasmaField.update();
+	    this.plasmaField.update();
         this.plasmaField.draw();
 
         // update powerbar and healthbar
@@ -152,12 +153,15 @@ export class Game extends Scene
             'enemy'
         );
 
+        // rotate to face centre
+        const angleDeg = Math.atan2(this.randomCirclePos.y - this.core.y, this.randomCirclePos.x - this.core.x) * 180 / Math.PI;
+        enemy.angle = angleDeg-90;
+
         this.enemies.add(enemy);
         this.physics.moveToObject(enemy, this.core, 100);
     }
 
     hitShield(shield, enemy){
-        console.log('got hit');
         enemy.destroy();
     }
 }

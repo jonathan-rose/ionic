@@ -38,6 +38,8 @@ export class Preloader extends Scene
         this.load.image('enemy', 'enemy.png');
         this.load.image('station', 'spaceStation.png');
         this.load.image('blank200', 'empty200x200.png');
+        this.load.image('healthShip', 'healthShip.png');
+        this.load.spritesheet('healthShipExplosion', 'healthShipExplosion.png', { frameWidth: 40, frameHeight: 40 });
     }
 
     create ()

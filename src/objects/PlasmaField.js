@@ -19,6 +19,12 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         this.shieldRadius = 200;
         this.isFiring = false;
 
+        this.body = new Phaser.Physics.Arcade.StaticBody(this.scene.physics.world, this);
+        this.body.x = 0;
+        this.body.y = 0;
+        this.body.width = 1024;
+        this.body.height = 768;
+
         this.tendrils = [];
         for (let i = 0; i < 30; i++) {
             this.tendrils.push(new Tendril(this.scene, this.shieldRadius));
@@ -35,7 +41,7 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         this.graphics.clear();
 
         if (this.isFiring) {
-            this.drawShield();
+            //this.drawShield();
             this.drawTendrils();
         } else {
             this.drawTendrils();
@@ -101,6 +107,12 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
 
     // @TODO: we should make the wiggles straighter when firing so the tendrils will easily fit through our cannon aperture.
     startFiring(angle) {
+        if (angle < 0) {
+            this.firingAngle = angle + 360;
+        } else {
+            this.firingAngle = angle;
+        }
+
         this.tendrils.forEach((t) => {
             t.previousRotation = t.rotation;
             t.previousRotationSpeed = t.rotationSpeed;
@@ -141,5 +153,23 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
                 }
             });
         });
+    }
+
+    /**
+     * Collision detection function between the plasma field and
+     * enemies.
+     *
+     * All the tendrils are at the same angle while firing, and
+     * all the enemies move from their starting position directly
+     * inwards, so we only need to check that the enemy started
+     * withing a few degrees of the first tendrils `rotation`.
+     */
+    collisionProcessor(plasmaField, enemy) {
+        if (!plasmaField.isFiring) {
+            return false;
+        }
+
+        return (enemy.spawnAngle > plasmaField.firingAngle - 15
+                && enemy.spawnAngle < plasmaField.firingAngle + 15);
     }
 }

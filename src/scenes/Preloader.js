@@ -33,8 +33,8 @@ export class Preloader extends Scene
         this.load.setPath('assets');
 
         this.load.image('logo', 'logo.png');
-        this.load.image('powerbar-background', 'barBackground.png');
-        this.load.image('powerbar-foreground', 'barForeground.png');
+        this.load.image('bar-background', 'barBackground.png');
+        this.load.image('bar-foreground', 'barForeground.png');
         this.load.image('enemy', 'enemy.png');
         this.load.image('station', 'spaceStation.png');
         this.load.image('blank200', 'empty200x200.png');

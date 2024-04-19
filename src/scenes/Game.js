@@ -47,15 +47,17 @@ export class Game extends Scene
             }
         });
 
-        this.core = this.physics.add.staticImage(512, 384, 'station');
+        this.core = this.physics.add.staticImage(512, 380, 'station');
 
-        this.powerbarBackground = this.add.image(950, 400, 'powerbar-background');
-        this.powerbarForeground = this.add.image(950, 400, 'powerbar-foreground');
-        this.powerbarForeground.setDepth(3);
+        this.powerbarBackground = this.add.image(950, 400, 'bar-background');
+        this.powerbarForeground = this.add.image(950, 400, 'bar-foreground');
+        this.powerbarBackground.setDepth(3);
+        this.powerbarForeground.setDepth(5);
 
-        this.healthbarBackground = this.add.image(75, 400, 'powerbar-background');
-        this.healthbarForeground = this.add.image(75, 400, 'powerbar-foreground');
-        this.healthbarForeground.setDepth(3);
+        this.healthbarBackground = this.add.image(75, 400, 'bar-background');
+        this.healthbarForeground = this.add.image(75, 400, 'bar-foreground');
+        this.healthbarBackground.setDepth(3);
+        this.healthbarForeground.setDepth(5);
 
         keys = this.input.keyboard.addKeys({
             'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
@@ -64,6 +66,7 @@ export class Game extends Scene
 
         // Add power bar
         graphicsPowerbar = this.add.graphics({ fillStyle: { color: 0xdeb841 }});
+        graphicsPowerbar.setDepth(4);
         rectanglePowerbar = new Phaser.Geom.Rectangle(
             this.powerbarForeground.getTopLeft().x,
             this.powerbarForeground.getTopLeft().y,
@@ -77,6 +80,7 @@ export class Game extends Scene
 
         // Add Health bar
         graphicsHealthbar = this.add.graphics({ fillStyle: { color: 0xe54489 }});
+        graphicsHealthbar.setDepth(4);
         rectangleHealthbar = new Phaser.Geom.Rectangle(
             this.healthbarForeground.getTopLeft().x,
             this.healthbarForeground.getTopLeft().y,
@@ -92,6 +96,12 @@ export class Game extends Scene
 
         this.shieldSurface = this.physics.add.staticImage(512 - 100, 384 - 100, 'blank200').setCircle(200);
 
+        // @TODO: can we make it so the shield disappears when firing?
+        // We could have little ships pop against the shield (not
+        // enough to drain it), but occasionally big ships will come
+        // onscreen and flood us with small ships so we need to plasma
+        // beam them, during the beaming small ships will make it
+        // through to the core and do damage.
         this.physics.add.overlap(this.shieldSurface, this.enemies, this.hitShield, null, this);
     }
 
@@ -110,7 +120,7 @@ export class Game extends Scene
 
         this.addEnemy();
 
-	    this.plasmaField.update();
+	this.plasmaField.update();
         this.plasmaField.draw();
 
         // update powerbar and healthbar
@@ -127,7 +137,7 @@ export class Game extends Scene
 
     makeShapeMask(rectangleBarType, graphicsType)
     {
-        const shape = this.make.graphics();
+        const shape = this.make.graphics({ fillStyle: { color: 0xffffff }});
         shape.fillStyle(0xffffff);
         shape.beginPath();
         shape.fillRoundedRect(

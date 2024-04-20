@@ -12,8 +12,7 @@ export class Game extends Scene
     create ()
     {
         this.cameras.main.setBackgroundColor(0xffffff);
-        this.cursors = this.input.keyboard.createCursorKeys();
-
+    
         this.shield = new Shield(
             this, 
             this.game.config.width / 2, 
@@ -31,12 +30,14 @@ export class Game extends Scene
     }
 
     update (time, delta) {
-        if (this.cursors.left.isDown) {
-            this.player.currentAngle -= 2;
-        } else if (this.cursors.right.isDown) {
-            this.player.currentAngle += 2;
-        }
+        // if (this.cursors.left.isDown) {
+        //     this.player.currentAngle -= 2;
+        // } else if (this.cursors.right.isDown) {
+        //     this.player.currentAngle += 2;
+        // } else if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
+        //     this.player.moveDown();
+        // }
 
-        this.player.update(time. delta);
+        this.player.update(time, delta);
     }
 }

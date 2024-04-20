@@ -9,8 +9,8 @@ export default class Shield extends Phaser.GameObjects.Arc {
         this.center = this.getCenter();
 
         this.setStrokeStyle(1, 0xff0000);
-        this.setX(this.x);
-        this.setY(this.y);
+        // this.setX(this.x);
+        // this.setY(this.y);
 
         this.scene.add.existing(this);
     }

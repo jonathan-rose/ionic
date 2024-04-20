@@ -14,7 +14,8 @@ export class Game extends Scene
         this.shield = new Shield(
             this, 
             this.game.config.width / 2, 
-            this.game.config.height / 2
+            this.game.config.height / 2,
+            250
         );
 
         this.player = new Player(

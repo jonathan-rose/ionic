@@ -1,4 +1,6 @@
 import { Scene } from 'phaser';
+import Player from '../objects/Player';
+import Shield from '../objects/Shield';
 import PlasmaField from '../objects/PlasmaField';
 import Util from '../util.js';
 
@@ -19,17 +21,14 @@ export class Game extends Scene
         super('Game');
     }
 
-    create ()
-    {
-        //this.cameras.main.setBackgroundColor(0x000000);
+    create () {    
         this.add.image(512, 384, 'background');
 
         this.plasmaField = new PlasmaField(this);
-        this.isFiring = false;
+        this.plasmaIsFiring = false;
 
         this.input.on('pointerdown', () => {
-
-            if (!this.isFiring) {
+            if (!this.plasmaIsFiring) {
                 this.plasmaField.startFiring(
                     Phaser.Math.RadToDeg(
                         Phaser.Math.Angle.Between(
@@ -40,10 +39,10 @@ export class Game extends Scene
                         )
                     )
                 );
-                this.isFiring = true;
+                this.plasmaIsFiring = true;
             } else {
                 this.plasmaField.stopFiring();
-                this.isFiring = false;
+                this.plasmaIsFiring = false;
             }
         });
 
@@ -96,15 +95,29 @@ export class Game extends Scene
 
         this.shieldSurface = this.physics.add.staticImage(512 - 100, 384 - 100, 'blank200').setCircle(200);
 
-        // @TODO: can we make it so the shield disappears when firing?
-        // We could have little ships pop against the shield (not
-        // enough to drain it), but occasionally big ships will come
-        // onscreen and flood us with small ships so we need to plasma
-        // beam them, during the beaming small ships will make it
-        // through to the core and do damage.
-        this.physics.add.overlap(this.shieldSurface, this.enemies, this.enemyHitShield, null, this);
+        // The shield disappears when firing allowing ships to get
+        // close to the station.
+        this.physics.add.overlap(this.shieldSurface, this.enemies, this.enemyHitShield, (s, e) => {return !this.plasmaField.isFiring;}, this);
 
-        var timer = this.time.addEvent({
+        this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.enemies, this.hitTendril, this.plasmaField.collisionProcessor, this);
+        
+        this.shield = new Shield(
+            this, 
+            this.game.config.width / 2, 
+            this.game.config.height / 2,
+            this.plasmaField.shieldRadius - 5
+        );
+
+        this.player = new Player(
+            this, 
+            this.shield.x,
+            this.shield.y, 
+            'player',
+            this.shield.height / 2
+        );
+        this.player.setDepth(5);
+
+	var timer = this.time.addEvent({
             delay: 5000,                // ms
             callback: this.addHealthShip,
             callbackScope: this,
@@ -121,6 +134,8 @@ export class Game extends Scene
     }
 
     update () {
+        this.player.update();
+      
         // Currently constantly increases power and health
         if (powerbarCurrent < powerbarMax){
             powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 5);
@@ -129,16 +144,14 @@ export class Game extends Scene
             healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 5);
         }
 
-        if (this.isFiring) {
+        if (this.plasmaIsFiring) {
             powerbarCurrent = Math.max(0, powerbarCurrent - 10);
         }
 
         this.addEnemy();
 
-	    this.plasmaField.update();
+	this.plasmaField.update();
         this.plasmaField.draw();
-
-        
 
         // update powerbar and healthbar
         graphicsPowerbar.clear();
@@ -170,21 +183,22 @@ export class Game extends Scene
 
     addEnemy(){
         this.start = new Phaser.Math.Vector2(512, 384);
-        this.rotation = Util.randBetween(0, 360);
-        this.randomCirclePos = Util.offsetByTrig(this.start, this.rotation, 700); //start, angle, distance
+        let spawnAngle = Util.randBetween(0, 360);
+        this.randomCirclePos = Util.offsetByTrig(this.start, spawnAngle, 700); //start, angle, distance
         var enemy = this.physics.add.sprite(
             this.randomCirclePos.x, 
             this.randomCirclePos.y, 
             'enemy'
         );
         enemy.setDepth(1);
+        enemy.spawnAngle = spawnAngle;
 
         // rotate to face centre
         const angleDeg = Math.atan2(this.randomCirclePos.y - this.core.y, this.randomCirclePos.x - this.core.x) * 180 / Math.PI;
         enemy.angle = angleDeg-90;
 
         this.enemies.add(enemy);
-        this.physics.moveToObject(enemy, this.core, 100);
+        this.physics.moveToObject(enemy, this.core, 50);
     }
 
     enemyHitShield(shield, enemy){
@@ -192,7 +206,11 @@ export class Game extends Scene
         healthbarCurrent = Math.max(0, healthbarCurrent - 10);
     }
 
-    addHealthShip(){
+    hitTendril(plasmaField, enemy) {
+        enemy.destroy();
+    }
+
+	addHealthShip(){
         this.start = new Phaser.Math.Vector2(512, 384);
         this.rotation = Util.randBetween(0, 360);
         this.randomCirclePos = Util.offsetByTrig(this.start, this.rotation, 700); //start, angle, distance

@@ -1,4 +1,6 @@
 import { Scene } from 'phaser';
+import Player from '../objects/Player';
+import Shield from '../objects/Shield';
 import PlasmaField from '../objects/PlasmaField';
 import Util from '../util.js';
 
@@ -19,8 +21,22 @@ export class Game extends Scene
         super('Game');
     }
 
-    create ()
-    {
+create () {
+        this.shield = new Shield(
+            this, 
+            this.game.config.width / 2, 
+            this.game.config.height / 2,
+            250
+        );
+
+        this.player = new Player(
+            this, 
+            this.shield.x,
+            this.shield.y, 
+            'player',
+            this.shield.height / 2
+        );
+      
         //this.cameras.main.setBackgroundColor(0x000000);
         this.add.image(512, 384, 'background');
 
@@ -103,6 +119,8 @@ export class Game extends Scene
     }
 
     update () {
+        this.player.update();
+      
         // Currently constantly increases power and health
         if (powerbarCurrent < powerbarMax){
             powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 5);
@@ -117,7 +135,7 @@ export class Game extends Scene
 
         this.addEnemy();
 
-	this.plasmaField.update();
+	      this.plasmaField.update();
         this.plasmaField.draw();
 
         // update powerbar and healthbar

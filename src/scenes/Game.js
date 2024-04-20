@@ -117,8 +117,8 @@ export class Game extends Scene
         );
         this.player.setDepth(5);
 
-	var timer = this.time.addEvent({
-            delay: 5000,                // ms
+	    var timer = this.time.addEvent({
+            delay: 5000,
             callback: this.addHealthShip,
             callbackScope: this,
             loop: true
@@ -131,6 +131,7 @@ export class Game extends Scene
             frameRate: 10
         });
         this.physics.add.overlap(this.shieldSurface, this.healthShips, this.healthShipHitShield, null, this);
+        this.physics.add.overlap(this.player, this.healthShips, this.collectHealthShip, null, this);
     }
 
     update () {
@@ -150,7 +151,7 @@ export class Game extends Scene
 
         this.addEnemy();
 
-	this.plasmaField.update();
+	    this.plasmaField.update();
         this.plasmaField.draw();
 
         // update powerbar and healthbar
@@ -238,5 +239,13 @@ export class Game extends Scene
         ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
             ship.destroy();
         }, this);
+    }
+
+    collectHealthShip(player, ship){
+        if (healthbarCurrent < healthbarMax){
+            healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 100);
+        }
+        ship.destroy();
+        // TODO: Add some nice animation or flurry of green plusses
     }
 }

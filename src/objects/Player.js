@@ -9,6 +9,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.sprite = sprite;
         this.center = this.getCenter();
         this.shieldRadius = radius;
+        this.defaultOrbitHoverDistance = 10;
         this.orbitHoverDistance = 10;
         this.currentAngle = 270;
         this.isLanding = false;
@@ -43,7 +44,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setHover(0);
         } else if (this.spaceKey.isUp) {
             this.isLanding = false;
-            this.setHover(10);
+            this.setHover(this.defaultOrbitHoverDistance);
         }
 
         if (this.cursors.left.isDown) {

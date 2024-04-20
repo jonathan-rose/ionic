@@ -10,9 +10,7 @@ export class Game extends Scene
     }
 
     create ()
-    {
-        this.cameras.main.setBackgroundColor(0xffffff);
-    
+    { 
         this.shield = new Shield(
             this, 
             this.game.config.width / 2, 

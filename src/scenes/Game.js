@@ -30,14 +30,6 @@ export class Game extends Scene
     }
 
     update (time, delta) {
-        // if (this.cursors.left.isDown) {
-        //     this.player.currentAngle -= 2;
-        // } else if (this.cursors.right.isDown) {
-        //     this.player.currentAngle += 2;
-        // } else if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
-        //     this.player.moveDown();
-        // }
-
         this.player.update(time, delta);
     }
 }

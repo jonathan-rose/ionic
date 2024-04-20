@@ -12,6 +12,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.orbitHoverDistance = 10;
         this.currentAngle = 270;
         this.isLanding = false;
+        this.movementSpeed = 2;
 
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.spaceKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -46,9 +47,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         if (this.cursors.left.isDown) {
-            this.currentAngle -= 1;
+            this.currentAngle -= this.movementSpeed;
         } else if (this.cursors.right.isDown) {
-            this.currentAngle += 1;
+            this.currentAngle += this.movementSpeed;
         }
 
         this.updatePosition();

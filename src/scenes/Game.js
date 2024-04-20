@@ -21,22 +21,7 @@ export class Game extends Scene
         super('Game');
     }
 
-create () {
-        this.shield = new Shield(
-            this, 
-            this.game.config.width / 2, 
-            this.game.config.height / 2,
-            250
-        );
-
-        this.player = new Player(
-            this, 
-            this.shield.x,
-            this.shield.y, 
-            'player',
-            this.shield.height / 2
-        );
-      
+create () {    
         //this.cameras.main.setBackgroundColor(0x000000);
         this.add.image(512, 384, 'background');
 
@@ -116,6 +101,22 @@ create () {
         this.physics.add.overlap(this.shieldSurface, this.enemies, this.hitShield, (s, e) => {return !this.plasmaField.isFiring;}, this);
 
         this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.enemies, this.hitTendril, this.plasmaField.collisionProcessor, this);
+        
+        this.shield = new Shield(
+            this, 
+            this.game.config.width / 2, 
+            this.game.config.height / 2,
+            this.plasmaField.shieldRadius - 5
+        );
+
+        this.player = new Player(
+            this, 
+            this.shield.x,
+            this.shield.y, 
+            'player',
+            this.shield.height / 2
+        );
+        this.player.setDepth(5);
     }
 
     update () {

@@ -21,8 +21,7 @@ export class Game extends Scene
         super('Game');
     }
 
-create () {    
-        //this.cameras.main.setBackgroundColor(0x000000);
+    create () {    
         this.add.image(512, 384, 'background');
 
         this.plasmaField = new PlasmaField(this);
@@ -98,7 +97,7 @@ create () {
 
         // The shield disappears when firing allowing ships to get
         // close to the station.
-        this.physics.add.overlap(this.shieldSurface, this.enemies, this.hitShield, (s, e) => {return !this.plasmaField.isFiring;}, this);
+        this.physics.add.overlap(this.shieldSurface, this.enemies, this.enemyHitShield, (s, e) => {return !this.plasmaField.isFiring;}, this);
 
         this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.enemies, this.hitTendril, this.plasmaField.collisionProcessor, this);
         
@@ -117,6 +116,22 @@ create () {
             this.shield.height / 2
         );
         this.player.setDepth(5);
+
+	    var timer = this.time.addEvent({
+            delay: 5000,
+            callback: this.addHealthShip,
+            callbackScope: this,
+            loop: true
+        });
+
+        this.healthShips = this.physics.add.group();
+        this.anims.create({
+            key: 'explode',
+            frames: this.anims.generateFrameNumbers('healthShipExplosion', { start: 0, end: 7 }),
+            frameRate: 10
+        });
+        this.physics.add.overlap(this.shieldSurface, this.healthShips, this.healthShipHitShield, null, this);
+        this.physics.add.overlap(this.player, this.healthShips, this.collectHealthShip, null, this);
     }
 
     update () {
@@ -136,7 +151,7 @@ create () {
 
         this.addEnemy();
 
-	      this.plasmaField.update();
+	    this.plasmaField.update();
         this.plasmaField.draw();
 
         // update powerbar and healthbar
@@ -187,12 +202,50 @@ create () {
         this.physics.moveToObject(enemy, this.core, 50);
     }
 
-    hitShield(shield, enemy){
+    enemyHitShield(shield, enemy){
         enemy.destroy();
         healthbarCurrent = Math.max(0, healthbarCurrent - 10);
     }
 
     hitTendril(plasmaField, enemy) {
         enemy.destroy();
+    }
+
+	addHealthShip(){
+        this.start = new Phaser.Math.Vector2(512, 384);
+        this.rotation = Util.randBetween(0, 360);
+        this.randomCirclePos = Util.offsetByTrig(this.start, this.rotation, 700); //start, angle, distance
+        var healthShip = this.physics.add.sprite(
+            this.randomCirclePos.x, 
+            this.randomCirclePos.y, 
+            'healthShipExplosion'
+        );
+        healthShip.setDepth(1);
+
+        // rotate to face centre
+        const angleDeg = Math.atan2(this.randomCirclePos.y - this.core.y, this.randomCirclePos.x - this.core.x) * 180 / Math.PI;
+        healthShip.angle = angleDeg-90;
+
+        this.healthShips.add(healthShip);
+        this.physics.moveToObject(healthShip, this.core, 40);
+    }
+
+    healthShipHitShield(shield, ship){
+        ship.body.velocity.x = 0;
+        ship.body.velocity.y = 0;
+
+        ship.anims.play('explode', true);
+
+        ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
+            ship.destroy();
+        }, this);
+    }
+
+    collectHealthShip(player, ship){
+        if (healthbarCurrent < healthbarMax){
+            healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 100);
+        }
+        ship.destroy();
+        // TODO: Add some nice animation or flurry of green plusses
     }
 }

@@ -25,10 +25,10 @@ export class Game extends Scene
         this.add.image(512, 384, 'background');
 
         this.plasmaField = new PlasmaField(this);
-        this.plasmaIsFiring = false;
+        this.plasmaField.isFiring = false;
 
         this.input.on('pointerdown', () => {
-            if (!this.plasmaIsFiring) {
+            if (!this.plasmaField.isFiring) {
                 this.plasmaField.startFiring(
                     Phaser.Math.RadToDeg(
                         Phaser.Math.Angle.Between(
@@ -39,10 +39,10 @@ export class Game extends Scene
                         )
                     )
                 );
-                this.plasmaIsFiring = true;
+                this.plasmaField.isFiring = true;
             } else {
                 this.plasmaField.stopFiring();
-                this.plasmaIsFiring = false;
+                this.plasmaField.isFiring = false;
             }
         });
 
@@ -113,7 +113,8 @@ export class Game extends Scene
             this.shield.x,
             this.shield.y, 
             'player',
-            this.shield.height / 2
+            this.shield.height / 2,
+            this.plasmaField
         );
         this.player.setDepth(5);
 
@@ -154,7 +155,7 @@ export class Game extends Scene
         //     healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 5);
         // }
 
-        if (this.plasmaIsFiring) {
+        if (this.plasmaField.isFiring) {
             powerbarCurrent = Math.max(0, powerbarCurrent - 10);
         }
 

@@ -16,9 +16,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.movementSpeed = 2;
         this.plasmaField = plasmaField;
         this.powerbarCurrent = 0;
-        this.powerbarMinimum = 100;
+        this.powerbarMinimum = this.scene.powerbarMinimum;
         this.depleted = false;
         this.cooldownState = false;
+        this.cooldownLength = 3000;
+        this.flashRunning = false;
+        this.flashLength = 200;
 
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.spaceKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -71,9 +74,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         if (this.depleted == true) {
             this.cooldownState = true;
-            this.cooldownTimer = this.scene.time.delayedCall(3000, () => {
+            this.cooldownTimer = this.scene.time.delayedCall(this.cooldownLength, () => {
                 this.cooldownState = false;
             }, [], this);
+        }
+
+        if (this.cooldownState == true && this.flashRunning == false) {
+            this.flashRunning = true;
+            this.flashTimer = this.scene.time.addEvent({
+                delay: this.flashLength,
+                callback: this.toggleTint,
+                callbackScope: this,
+                loop: true
+            })
         }
 
         if (this.powerbarCurrent <= 0) {
@@ -91,5 +104,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.updatePosition();
 
         this.rotation = Phaser.Math.DegToRad(this.currentAngle) - Math.PI / 2;
+    }
+
+    toggleTint() {
+        if (this.cooldownState == true && this.powerbarCurrent < this.powerbarMinimum) {
+            if (this.scene.powerbarBackground.tintTopLeft === 0xffffff) {
+                this.scene.powerbarBackground.setTint(0xff0000);
+            } else if (this.scene.powerbarBackground.tintTopLeft === 0xff0000) {
+                this.scene.powerbarBackground.setTint(0xffffff);
+            }
+        } else if (this.cooldownState == false && this.powerbarCurrent >= this.powerbarMinimum) {
+            this.flashTimer.remove();
+            this.flashRunning = false;
+            this.scene.powerbarBackground.clearTint();
+        }
     }
 }

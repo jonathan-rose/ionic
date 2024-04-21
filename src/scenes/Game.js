@@ -59,6 +59,18 @@ export class Game extends Scene
 
         this.makeShapeMask(rectanglePowerbar, graphicsPowerbar);
 
+        this.powerbarMinimum = 100;
+        this.graphicsPowerbarMinimum = this.add.graphics ({ fillStyle: {color: 0xff0000, alpha: 0.5}});
+        this.graphicsPowerbarMinimum.fillRect(
+            this.powerbarForeground.getBottomLeft().x,
+            this.powerbarForeground.getBottomLeft().y - this.powerbarMinimum,
+            this.powerbarForeground.width,
+            this.powerbarMinimum
+        );
+        this.graphicsPowerbarMinimum.setDepth(4);
+
+        this.makeShapeMask(rectanglePowerbar, this.graphicsPowerbarMinimum);
+
         // Add Health bar
         graphicsHealthbar = this.add.graphics({ fillStyle: { color: 0xe54489 }});
         graphicsHealthbar.setDepth(4);
@@ -97,6 +109,7 @@ export class Game extends Scene
             'player',
             this.shield.height / 2,
             this.plasmaField,
+            graphicsPowerbar
         );
         this.player.setDepth(5);
 

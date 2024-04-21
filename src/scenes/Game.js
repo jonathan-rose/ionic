@@ -117,7 +117,7 @@ export class Game extends Scene
         );
         this.player.setDepth(5);
 
-	    var timer = this.time.addEvent({
+	    var healthShiptimer = this.time.addEvent({
             delay: 5000,
             callback: this.addHealthShip,
             callbackScope: this,
@@ -132,6 +132,15 @@ export class Game extends Scene
         });
         this.physics.add.overlap(this.shieldSurface, this.healthShips, this.healthShipHitShield, null, this);
         this.physics.add.overlap(this.player, this.healthShips, this.collectHealthShip, null, this);
+
+        var bigShiptimer = this.time.addEvent({
+            delay: 4000,
+            callback: this.addBigShip,
+            callbackScope: this,
+            loop: true
+        });
+        this.bigShips = this.physics.add.group();
+        this.physics.add.overlap(this.shieldSurface, this.bigShips, this.bigShipHitShield, null, this);
     }
 
     update () {
@@ -139,11 +148,11 @@ export class Game extends Scene
       
         // Currently constantly increases power and health
         if (powerbarCurrent < powerbarMax){
-            powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 5);
+            powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 1);
         }
-        if (healthbarCurrent < healthbarMax){
-            healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 5);
-        }
+        // if (healthbarCurrent < healthbarMax){
+        //     healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 5);
+        // }
 
         if (this.plasmaIsFiring) {
             powerbarCurrent = Math.max(0, powerbarCurrent - 10);
@@ -151,7 +160,7 @@ export class Game extends Scene
 
         this.addEnemy();
 
-	    this.plasmaField.update();
+        this.plasmaField.update();
         this.plasmaField.draw();
 
         // update powerbar and healthbar
@@ -182,50 +191,41 @@ export class Game extends Scene
         graphicsType.setMask(mask);
     }
 
-    addEnemy(){
+    addShip(sprite){
         this.start = new Phaser.Math.Vector2(512, 384);
         let spawnAngle = Util.randBetween(0, 360);
         this.randomCirclePos = Util.offsetByTrig(this.start, spawnAngle, 700); //start, angle, distance
-        var enemy = this.physics.add.sprite(
+        var ship = this.physics.add.sprite(
             this.randomCirclePos.x, 
             this.randomCirclePos.y, 
-            'enemy'
+            sprite
         );
-        enemy.setDepth(1);
-        enemy.spawnAngle = spawnAngle;
+        ship.setDepth(1);
+        ship.spawnAngle = spawnAngle;
 
         // rotate to face centre
         const angleDeg = Math.atan2(this.randomCirclePos.y - this.core.y, this.randomCirclePos.x - this.core.x) * 180 / Math.PI;
-        enemy.angle = angleDeg-90;
+        ship.angle = angleDeg-90;
+        return ship;
+    }
 
+    addEnemy(){
+        var enemy = this.addShip('enemy');
         this.enemies.add(enemy);
         this.physics.moveToObject(enemy, this.core, 50);
     }
 
     enemyHitShield(shield, enemy){
         enemy.destroy();
-        healthbarCurrent = Math.max(0, healthbarCurrent - 10);
+        //healthbarCurrent = Math.max(0, healthbarCurrent - 10);
     }
 
     hitTendril(plasmaField, enemy) {
         enemy.destroy();
     }
 
-	addHealthShip(){
-        this.start = new Phaser.Math.Vector2(512, 384);
-        this.rotation = Util.randBetween(0, 360);
-        this.randomCirclePos = Util.offsetByTrig(this.start, this.rotation, 700); //start, angle, distance
-        var healthShip = this.physics.add.sprite(
-            this.randomCirclePos.x, 
-            this.randomCirclePos.y, 
-            'healthShipExplosion'
-        );
-        healthShip.setDepth(1);
-
-        // rotate to face centre
-        const angleDeg = Math.atan2(this.randomCirclePos.y - this.core.y, this.randomCirclePos.x - this.core.x) * 180 / Math.PI;
-        healthShip.angle = angleDeg-90;
-
+    addHealthShip(){
+        var healthShip = this.addShip('healthShipExplosion');
         this.healthShips.add(healthShip);
         this.physics.moveToObject(healthShip, this.core, 40);
     }
@@ -247,5 +247,19 @@ export class Game extends Scene
         }
         ship.destroy();
         // TODO: Add some nice animation or flurry of green plusses
+    }
+
+    addBigShip(){
+        var bigShip = this.addShip('bigShip');
+        this.bigShips.add(bigShip);
+        this.physics.moveToObject(bigShip, this.core, 40);
+    }
+
+    bigShipHitShield(shield, ship){
+        ship.body.velocity.x = 0;
+        ship.body.velocity.y = 0;
+        healthbarCurrent = Math.max(0, healthbarCurrent - 100);
+
+        ship.destroy();
     }
 }

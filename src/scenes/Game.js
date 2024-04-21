@@ -13,6 +13,7 @@ var graphicsHealthbar;
 var rectangleHealthbar;
 var healthbarCurrent;
 var healthbarMax;
+var plasmaConsumeRate = 4;
 
 export class Game extends Scene
 {
@@ -25,26 +26,7 @@ export class Game extends Scene
         this.add.image(512, 384, 'background');
 
         this.plasmaField = new PlasmaField(this);
-        this.plasmaIsFiring = false;
-
-        this.input.on('pointerdown', () => {
-            if (!this.plasmaIsFiring) {
-                this.plasmaField.startFiring(
-                    Phaser.Math.RadToDeg(
-                        Phaser.Math.Angle.Between(
-                            512,
-                            383,
-                            this.input.mousePointer.x,
-                            this.input.mousePointer.y
-                        )
-                    )
-                );
-                this.plasmaIsFiring = true;
-            } else {
-                this.plasmaField.stopFiring();
-                this.plasmaIsFiring = false;
-            }
-        });
+        this.plasmaField.isFiring = false;
 
         this.core = this.physics.add.staticImage(512, 380, 'station');
 
@@ -76,6 +58,18 @@ export class Game extends Scene
         powerbarMax = 600;
 
         this.makeShapeMask(rectanglePowerbar, graphicsPowerbar);
+
+        this.powerbarMinimum = 100;
+        this.graphicsPowerbarMinimum = this.add.graphics ({ fillStyle: {color: 0xff0000, alpha: 0.5}});
+        this.graphicsPowerbarMinimum.fillRect(
+            this.powerbarForeground.getBottomLeft().x,
+            this.powerbarForeground.getBottomLeft().y - this.powerbarMinimum,
+            this.powerbarForeground.width,
+            this.powerbarMinimum
+        );
+        this.graphicsPowerbarMinimum.setDepth(4);
+
+        this.makeShapeMask(rectanglePowerbar, this.graphicsPowerbarMinimum);
 
         // Add Health bar
         graphicsHealthbar = this.add.graphics({ fillStyle: { color: 0xe54489 }});
@@ -111,7 +105,9 @@ export class Game extends Scene
             this.shield.x,
             this.shield.y, 
             'player',
-            this.shield.height / 2
+            this.shield.height / 2,
+            this.plasmaField,
+            graphicsPowerbar
         );
         this.player.setDepth(5);
 
@@ -151,15 +147,15 @@ export class Game extends Scene
     }
 
     update () {
-        this.player.update();
+        this.player.update(powerbarCurrent);
       
         // Currently constantly increases power and health
         if (powerbarCurrent < powerbarMax){
             powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 1);
         }
 
-        if (this.plasmaIsFiring) {
-            powerbarCurrent = Math.max(0, powerbarCurrent - 10);
+        if (this.plasmaField.isFiring) {
+            powerbarCurrent = Math.max(0, powerbarCurrent - plasmaConsumeRate);
         }
 
         this.addSmallShip();

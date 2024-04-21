@@ -9,7 +9,6 @@ import Util from '../util';
  * Each tendril is a Bezier curve that starts in the middle of the 
  * screen and projects outward at some angle.
  */
-
 export default class PlasmaField extends Phaser.GameObjects.Container {
 
     constructor(scene) {
@@ -41,11 +40,12 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         this.graphics.clear();
 
         if (this.isFiring) {
-            //this.drawShield();
+            this.drawShieldInner();
             this.drawTendrils();
         } else {
             this.drawTendrils();
-            this.drawShield();
+            this.drawShieldOuter();
+            this.drawShieldInner();
         }
     }
 
@@ -62,7 +62,7 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         });
     }
 
-    drawShield() {
+    drawShieldOuter() {
         // black ring to cut off the end of the tendrils
         this.graphics.lineStyle(20, 0x0, 1);
         this.graphics.beginPath();
@@ -78,6 +78,14 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         this.graphics.strokePath();
 
         // inner ring
+        this.graphics.lineStyle(3, 0xE54489, 1);
+        this.graphics.beginPath();
+        this.graphics.arc(512, 383, 40, 0, Phaser.Math.DegToRad(360));
+        this.graphics.closePath();
+        this.graphics.strokePath();
+    }
+
+    drawShieldInner() {
         this.graphics.lineStyle(3, 0xE54489, 1);
         this.graphics.beginPath();
         this.graphics.arc(512, 383, 40, 0, Phaser.Math.DegToRad(360));
@@ -169,7 +177,21 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
             return false;
         }
 
-        return (enemy.spawnAngle > plasmaField.firingAngle - 15
-                && enemy.spawnAngle < plasmaField.firingAngle + 15);
+        // sometimes when firing to the right (firingAngle ~= 0), some
+        // ships we want to destroy might be in the range 0-15 and some
+        // might be 345-360.
+        if (plasmaField.firingAngle < 15) {
+            // also get stuff below 360
+            return (enemy.spawnAngle < plasmaField.firingAngle + 15
+                    || enemy.spawnAngle > 360 - (15 - plasmaField.firingAngle));
+        } else if (plasmaField.firingAngle >= 345) {
+            // also get stuff above 0
+            return (enemy.spawnAngle > plasmaField.firingAngle - 15
+                    || enemy.spawnAngle < 15 - (360 - plasmaField.firingAngle));
+        } else {
+            // normal cone which doesn't cross 0 degrees
+            return (enemy.spawnAngle > plasmaField.firingAngle - 15
+                    && enemy.spawnAngle < plasmaField.firingAngle + 15);
+        }
     }
 }

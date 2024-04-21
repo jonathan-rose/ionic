@@ -91,15 +91,13 @@ export class Game extends Scene
 
         this.makeShapeMask(rectangleHealthbar, graphicsHealthbar);
 
-        this.enemies = this.physics.add.group();
+        this.smallShips = this.physics.add.group();
 
         this.shieldSurface = this.physics.add.staticImage(512 - 100, 384 - 100, 'blank200').setCircle(200);
 
         // The shield disappears when firing allowing ships to get
         // close to the station.
-        this.physics.add.overlap(this.shieldSurface, this.enemies, this.enemyHitShield, (s, e) => {return !this.plasmaField.isFiring;}, this);
-
-        this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.enemies, this.hitTendril, this.plasmaField.collisionProcessor, this);
+        this.physics.add.overlap(this.shieldSurface, this.smallShips, this.smallShipHitShield, (s, e) => {return !this.plasmaField.isFiring;}, this);
         
         this.shield = new Shield(
             this, 
@@ -141,6 +139,15 @@ export class Game extends Scene
         });
         this.bigShips = this.physics.add.group();
         this.physics.add.overlap(this.shieldSurface, this.bigShips, this.bigShipHitShield, null, this);
+        // A group for the tendrils to interact with
+        this.destroyableShips = this.physics.add.group();
+
+        this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.destroyableShips, this.hitTendril, this.plasmaField.collisionProcessor, this);
+
+        //  The score
+        this.scoreText = this.add.text(16, 46, 'score: 0', { fontSize: '32px', fill: '#FFF' });
+        this.scoreText.setDepth(5);
+        this.score = 0;
     }
 
     update () {
@@ -150,15 +157,12 @@ export class Game extends Scene
         if (powerbarCurrent < powerbarMax){
             powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 1);
         }
-        // if (healthbarCurrent < healthbarMax){
-        //     healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 5);
-        // }
 
         if (this.plasmaIsFiring) {
             powerbarCurrent = Math.max(0, powerbarCurrent - 10);
         }
 
-        this.addEnemy();
+        this.addSmallShip();
 
         this.plasmaField.update();
         this.plasmaField.draw();
@@ -206,26 +210,30 @@ export class Game extends Scene
         // rotate to face centre
         const angleDeg = Math.atan2(this.randomCirclePos.y - this.core.y, this.randomCirclePos.x - this.core.x) * 180 / Math.PI;
         ship.angle = angleDeg-90;
+        this.destroyableShips.add(ship);
         return ship;
     }
 
-    addEnemy(){
-        var enemy = this.addShip('enemy');
-        this.enemies.add(enemy);
-        this.physics.moveToObject(enemy, this.core, 50);
+    addSmallShip(){
+        var smallShip = this.addShip('smallShip');
+        smallShip.scoreValue = 5;
+        this.smallShips.add(smallShip);
+        this.physics.moveToObject(smallShip, this.core, 50);
     }
 
-    enemyHitShield(shield, enemy){
-        enemy.destroy();
+    smallShipHitShield(shield, ship){
+        ship.destroy();
         //healthbarCurrent = Math.max(0, healthbarCurrent - 10);
     }
 
-    hitTendril(plasmaField, enemy) {
-        enemy.destroy();
+    hitTendril(plasmaField, ship) {
+        ship.destroy();
+        this.increaseScore(ship.scoreValue);
     }
 
     addHealthShip(){
         var healthShip = this.addShip('healthShipExplosion');
+        healthShip.scoreValue = 0;
         this.healthShips.add(healthShip);
         this.physics.moveToObject(healthShip, this.core, 40);
     }
@@ -251,6 +259,7 @@ export class Game extends Scene
 
     addBigShip(){
         var bigShip = this.addShip('bigShip');
+        bigShip.scoreValue = 100;
         this.bigShips.add(bigShip);
         this.physics.moveToObject(bigShip, this.core, 40);
     }
@@ -261,5 +270,10 @@ export class Game extends Scene
         healthbarCurrent = Math.max(0, healthbarCurrent - 100);
 
         ship.destroy();
+    }
+
+    increaseScore(increase){
+        this.score += increase;
+        this.scoreText.setText('Score: ' + this.score);
     }
 }

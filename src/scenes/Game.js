@@ -114,7 +114,7 @@ export class Game extends Scene
             this.shield.y, 
             'player',
             this.shield.height / 2,
-            this.plasmaField
+            this.plasmaField,
         );
         this.player.setDepth(5);
 
@@ -145,7 +145,7 @@ export class Game extends Scene
     }
 
     update () {
-        this.player.update();
+        this.player.update(powerbarCurrent);
       
         // Currently constantly increases power and health
         if (powerbarCurrent < powerbarMax){

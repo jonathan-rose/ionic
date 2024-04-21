@@ -15,6 +15,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.isLanding = false;
         this.movementSpeed = 2;
         this.plasmaField = plasmaField;
+        this.powerbarCurrent = 0;
 
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.spaceKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -39,8 +40,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.y = this.center.y + this.orbitDistance * Math.sin(Phaser.Math.DegToRad(this.currentAngle));
     }
 
-    update(time, delta) {
-        if (this.spaceKey.isDown) {
+    update(powerbarCurrent) {
+        this.powerbarCurrent = 1;
+
+        if (this.spaceKey.isDown && this.powerbarCurrent > 0) {
             this.isLanding = true;
             this.setHover(0);
             this.plasmaField.startFiring(

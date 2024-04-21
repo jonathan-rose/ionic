@@ -13,6 +13,7 @@ var graphicsHealthbar;
 var rectangleHealthbar;
 var healthbarCurrent;
 var healthbarMax;
+var plasmaConsumeRate = 4;
 
 export class Game extends Scene
 {
@@ -26,25 +27,6 @@ export class Game extends Scene
 
         this.plasmaField = new PlasmaField(this);
         this.plasmaField.isFiring = false;
-
-        this.input.on('pointerdown', () => {
-            if (!this.plasmaField.isFiring) {
-                this.plasmaField.startFiring(
-                    Phaser.Math.RadToDeg(
-                        Phaser.Math.Angle.Between(
-                            512,
-                            383,
-                            this.input.mousePointer.x,
-                            this.input.mousePointer.y
-                        )
-                    )
-                );
-                this.plasmaField.isFiring = true;
-            } else {
-                this.plasmaField.stopFiring();
-                this.plasmaField.isFiring = false;
-            }
-        });
 
         this.core = this.physics.add.staticImage(512, 380, 'station');
 
@@ -156,7 +138,7 @@ export class Game extends Scene
         // }
 
         if (this.plasmaField.isFiring) {
-            powerbarCurrent = Math.max(0, powerbarCurrent - 10);
+            powerbarCurrent = Math.max(0, powerbarCurrent - plasmaConsumeRate);
         }
 
         this.addEnemy();

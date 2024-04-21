@@ -16,6 +16,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.movementSpeed = 2;
         this.plasmaField = plasmaField;
         this.powerbarCurrent = 0;
+        this.powerbarMinimum = 100;
+        this.depleted = false;
+        this.cooldownState = false;
 
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.spaceKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -43,26 +46,40 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     update(powerbarCurrent) {
         this.powerbarCurrent = powerbarCurrent;
 
-        if (this.spaceKey.isDown && this.powerbarCurrent > 0) {
-            this.isLanding = true;
-            this.setHover(0);
-            this.plasmaField.startFiring(
-                Phaser.Math.RadToDeg(
-                    Phaser.Math.Angle.Between(
-                        512,
-                        383,
-                        this.x,
-                        this.y
-                    )
-                ));
-            this.plasmaField.isFiring = true;
-        } else if (this.spaceKey.isUp) {
-            this.isLanding = false;
-            this.setHover(this.defaultOrbitHoverDistance);
-            if (this.plasmaField.isFiring) {
-                this.plasmaField.stopFiring();
-                this.plasmaField.isFiring = false;
+        if (this.cooldownState == false) {
+            if (this.spaceKey.isDown && this.powerbarCurrent > 0 && this.depleted == false) {
+                this.isLanding = true;
+                this.setHover(0);
+                this.plasmaField.startFiring(
+                    Phaser.Math.RadToDeg(
+                        Phaser.Math.Angle.Between(
+                            512,
+                            383,
+                            this.x,
+                            this.y
+                        )
+                    ));
+            } else if (this.spaceKey.isUp || this.powerbarCurrent == 0 || this.powerbarCurrent < 0) {
+                this.isLanding = false;
+                this.setHover(this.defaultOrbitHoverDistance);
+                if (this.plasmaField.isFiring) {
+                    this.plasmaField.stopFiring();
+                    this.plasmaField.isFiring = false;
+                }
             }
+        }
+
+        if (this.depleted == true) {
+            this.cooldownState = true;
+            this.cooldownTimer = this.scene.time.delayedCall(3000, () => {
+                this.cooldownState = false;
+            }, [], this);
+        }
+
+        if (this.powerbarCurrent <= 0) {
+            this.depleted = true;
+        } else if (this.powerbarCurrent >= this.powerbarMinimum) {
+            this.depleted = false;
         }
 
         if (this.cursors.left.isDown) {

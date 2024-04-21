@@ -41,7 +41,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(powerbarCurrent) {
-        this.powerbarCurrent = 1;
+        this.powerbarCurrent = powerbarCurrent;
 
         if (this.spaceKey.isDown && this.powerbarCurrent > 0) {
             this.isLanding = true;

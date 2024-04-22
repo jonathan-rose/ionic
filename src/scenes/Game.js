@@ -40,10 +40,10 @@ export class Game extends Scene
         this.healthbarBackground.setDepth(3);
         this.healthbarForeground.setDepth(5);
 
-        keys = this.input.keyboard.addKeys({
-            'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
-            'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
-        });
+        // keys = this.input.keyboard.addKeys({
+        //     'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
+        //     'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
+        // });
 
         // Add power bar
         graphicsPowerbar = this.add.graphics({ fillStyle: { color: 0xdeb841 }});
@@ -135,6 +135,15 @@ export class Game extends Scene
         });
         this.bigShips = this.physics.add.group();
         this.physics.add.overlap(this.shieldSurface, this.bigShips, this.bigShipHitShield, null, this);
+
+        // Set off screen wipe bomb with enter
+        // this.add.image(500, 50, 'smallShip');
+        // this.add.image(550, 50, 'smallShip');
+        this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+        this.enterKey.on('down', ()=> {
+            this.useBomb();
+        });
+
         // A group for the tendrils to interact with
         this.destroyableShips = this.physics.add.group();
 
@@ -271,5 +280,15 @@ export class Game extends Scene
     increaseScore(increase){
         this.score += increase;
         this.scoreText.setText('Score: ' + this.score);
+    }
+
+    useBomb(){
+        this.plasmaField.fullScreenTendrilsOn();
+        var screenWipeTimer = this.time.addEvent({
+            delay: 2000,
+            callback: this.plasmaField.fullScreenTendrilsOff,
+            callbackScope: this.plasmaField,
+            loop: false
+        });
     }
 }

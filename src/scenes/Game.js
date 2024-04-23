@@ -88,10 +88,12 @@ export class Game extends Scene
         this.smallShips = this.physics.add.group();
 
         this.shieldSurface = this.physics.add.staticImage(512 - 100, 384 - 100, 'blank200').setCircle(200);
+        this.shieldSurface.radius = 200; // I'm so sorry
 
         // The shield disappears when firing allowing ships to get
         // close to the station.
-        this.physics.add.overlap(this.shieldSurface, this.smallShips, this.smallShipHitShield, (s, e) => {return !this.plasmaField.isFiring;}, this);
+        this.physics.add.overlap(this.shieldSurface, this.smallShips, this.smallShipHitShield, null, this);
+        // (s, e) => {return !this.plasmaField.isFiring;}
         
         this.shield = new Shield(
             this, 
@@ -136,16 +138,28 @@ export class Game extends Scene
         this.bigShips = this.physics.add.group();
         this.physics.add.overlap(this.shieldSurface, this.bigShips, this.bigShipHitShield, null, this);
 
-        // Set off screen wipe bomb with enter
-        // this.add.image(500, 50, 'smallShip');
-        // this.add.image(550, 50, 'smallShip');
-        this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-        this.enterKey.on('down', ()=> {
-            this.useBomb();
-        });
-
         // A group for the tendrils to interact with
         this.destroyableShips = this.physics.add.group();
+
+        // Set off screen wipe bomb with enter
+        this.bomb1 = this.add.image(500, 50, 'smallShip');
+        this.bomb2 = this.add.image(550, 50, 'smallShip');
+        this.bomb3 = this.add.image(600, 50, 'smallShip');
+        this.bombs = [this.bomb1, this.bomb2, this.bomb3];
+        // this.bombCircle = new Phaser.Geom.Circle(
+        //     512,
+        //     380,
+        //     100
+        // );
+        //this.bombCollider = this.physics.add.overlap(this.shieldSurface, this.destroyableShips, (circle, ship) => {ship.destroy();}, null, this);
+        this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+        this.enterKey.on('down', ()=> {
+            if (this.bombs.length > 0){
+                this.useBomb();
+                this.bombs.pop().destroy();
+            }
+            
+        });
 
         this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.destroyableShips, this.hitTendril, this.plasmaField.collisionProcessor, this);
 
@@ -157,6 +171,7 @@ export class Game extends Scene
 
     update () {
         this.player.update(powerbarCurrent);
+        console.log(this.shieldSurface.body.radius);
       
         // Currently constantly increases power and health
         if (powerbarCurrent < powerbarMax){
@@ -289,6 +304,27 @@ export class Game extends Scene
             callback: this.plasmaField.fullScreenTendrilsOff,
             callbackScope: this.plasmaField,
             loop: false
+        });
+
+        // DO NOT TOUCH
+        // ONLY WORKS EXCATLY AS IS
+        // I am sorry
+
+        this.tweens.add({
+            targets: this.shieldSurface,
+            radius: 1000,
+            duration: 1000,
+            onComplete: (tween, targets) => {                
+                targets[0].body.x = 512-(200);
+                targets[0].body.y = 384-(200);
+                targets[0].body.setCircle(200);
+                targets[0].radius = 200;
+            },
+            onUpdate: (tween, target, key, current) => {
+                target.body.setCircle(current);
+                target.body.x = 512-(current);
+                target.body.y = 384-(current);
+            }
         });
     }
 }

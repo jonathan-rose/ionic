@@ -113,7 +113,7 @@ export class Game extends Scene
         );
         this.player.setDepth(5);
 
-	    var healthShiptimer = this.time.addEvent({
+	var healthShiptimer = this.time.addEvent({
             delay: 5000,
             callback: this.addHealthShip,
             callbackScope: this,
@@ -166,7 +166,7 @@ export class Game extends Scene
 
     update () {
         this.player.update(powerbarCurrent);
-      
+
         // Currently constantly increases power and health
         if (powerbarCurrent < powerbarMax){
             powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 1);

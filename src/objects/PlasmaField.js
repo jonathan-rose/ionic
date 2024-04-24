@@ -17,6 +17,7 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         this.graphics = this.scene.add.graphics();
         this.shieldRadius = 200;
         this.isFiring = false;
+        this.isDepleted = false;
         this.isFiringFullScreen = false;
 
         this.body = new Phaser.Physics.Arcade.StaticBody(this.scene.physics.world, this);
@@ -51,16 +52,18 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
     }
 
     drawTendrils() {
-        this.tendrils.forEach((t) => {
-            this.drawGradientCurve(t.curve, 0xE54489, 18);
-            this.drawGradientCurve(t.curve, 0xE54489, 18, true);
+        if (this.isDepleted == false) {
+            this.tendrils.forEach((t) => {
+                this.drawGradientCurve(t.curve, 0xE54489, 18);
+                this.drawGradientCurve(t.curve, 0xE54489, 18, true);
 
-            this.graphics.lineStyle(8, 0x3335D7, 1);
-            t.curve.draw(this.graphics);
+                this.graphics.lineStyle(8, 0x3335D7, 1);
+                t.curve.draw(this.graphics);
 
-            this.graphics.lineStyle(2, 0xffffff, 1);
-            t.curve.draw(this.graphics);
-        });
+                this.graphics.lineStyle(2, 0xffffff, 1);
+                t.curve.draw(this.graphics);
+            });
+        }
     }
 
     drawShieldOuter() {
@@ -184,15 +187,15 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         if (plasmaField.firingAngle < 15) {
             // also get stuff below 360
             return (enemy.spawnAngle < plasmaField.firingAngle + 15
-                    || enemy.spawnAngle > 360 - (15 - plasmaField.firingAngle));
+                || enemy.spawnAngle > 360 - (15 - plasmaField.firingAngle));
         } else if (plasmaField.firingAngle >= 345) {
             // also get stuff above 0
             return (enemy.spawnAngle > plasmaField.firingAngle - 15
-                    || enemy.spawnAngle < 15 - (360 - plasmaField.firingAngle));
+                || enemy.spawnAngle < 15 - (360 - plasmaField.firingAngle));
         } else {
             // normal cone which doesn't cross 0 degrees
             return (enemy.spawnAngle > plasmaField.firingAngle - 15
-                    && enemy.spawnAngle < plasmaField.firingAngle + 15);
+                && enemy.spawnAngle < plasmaField.firingAngle + 15);
         }
     }
 

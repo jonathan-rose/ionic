@@ -31,4 +31,8 @@ export default class Util {
         let newY = Math.round(Math.sin(angle * Math.PI / 180) * distance + start.y);
         return new Phaser.Math.Vector2(newX, newY);
     }
+
+    static mod(n, m) {
+        return ((n % m) + m) % m;
+    }
 }

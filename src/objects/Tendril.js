@@ -20,7 +20,7 @@ export default class Tendril {
         this.radius = radius;
         this.innerRadius = 40;
         this.rotation = Util.randBetween(0, 360);
-        this.rotationSpeed = Util.randNth([-0.5, 0.5]);
+        this.rotationSpeed = Util.randBetween(-0.5, 0.5);
         this.p1rotationOffset = -20;
         this.p2rotationOffset = 20;
         this.p1radiusMultiplier = 0.8;
@@ -31,7 +31,7 @@ export default class Tendril {
     }
 
     update() {
-        this.rotation = (this.rotation + this.rotationSpeed) % 360;
+        this.rotation = Util.mod((this.rotation + this.rotationSpeed), 360);
         this.recalculateCurve();
     }
 
@@ -51,7 +51,6 @@ export default class Tendril {
         );
     }
 
-    // @TODO: make these more dynamic and random
     addTweens() {
         this.scene.tweens.add({
             targets: this,

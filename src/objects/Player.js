@@ -78,6 +78,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.cooldownState = false;
             }, [], this);
             this.plasmaField.isDepleted = true;
+
+            // turn off beam sound when running out of energy
+            // @NOTE: we're not setting the hacky
+            // beamFiringSoundPlaying boolean to false, as we want the
+            // player to release space first.
+            let s = this.scene.beamFiringSound;
+            if (s && s.isPlaying) {
+                s.stop();
+            }
         }
 
         if (this.cooldownState == true && this.flashRunning == false) {

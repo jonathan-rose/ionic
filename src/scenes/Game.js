@@ -240,8 +240,8 @@ export class Game extends Scene
 
     smallShipHitShield(shield, ship){
         ship.destroy();
-        if (!this.plasmaField.fullScreenTendrilsOn){
-            healthbarCurrent = Math.max(0, healthbarCurrent - 1);
+        if (!this.plasmaField.isFiringFullScreen){
+            healthbarCurrent = Math.max(0, healthbarCurrent - 5);
         }
     }
 
@@ -286,7 +286,7 @@ export class Game extends Scene
     bigShipHitShield(shield, ship){
         ship.body.velocity.x = 0;
         ship.body.velocity.y = 0;
-        if (!this.plasmaField.fullScreenTendrilsOn){
+        if (!this.plasmaField.isFiringFullScreen){
             healthbarCurrent = Math.max(0, healthbarCurrent - 100);
         }
         ship.destroy();

@@ -26,6 +26,7 @@ export class MainMenu extends Scene
         });
 
         this.sound.play('music', {loop: true});
+        this.registry.set('highscore', 0);
     }
 
     update() {

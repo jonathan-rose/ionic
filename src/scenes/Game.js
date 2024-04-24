@@ -22,7 +22,7 @@ export class Game extends Scene
         super('Game');
     }
 
-    create () {    
+    create () {
         this.add.image(512, 384, 'background');
 
         this.plasmaField = new PlasmaField(this);
@@ -39,11 +39,6 @@ export class Game extends Scene
         this.healthbarForeground = this.add.image(75, 400, 'bar-foreground');
         this.healthbarBackground.setDepth(3);
         this.healthbarForeground.setDepth(5);
-
-        // keys = this.input.keyboard.addKeys({
-        //     'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
-        //     'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
-        // });
 
         // Add power bar
         graphicsPowerbar = this.add.graphics({ fillStyle: { color: 0xdeb841 }});
@@ -113,7 +108,7 @@ export class Game extends Scene
         );
         this.player.setDepth(5);
 
-	var healthShiptimer = this.time.addEvent({
+	    var healthShiptimer = this.time.addEvent({
             delay: 5000,
             callback: this.addHealthShip,
             callbackScope: this,
@@ -194,6 +189,12 @@ export class Game extends Scene
         rectangleHealthbar.setSize(this.healthbarForeground.width, healthbarCurrent);
         rectangleHealthbar.y = this.healthbarForeground.getBottomLeft().y - healthbarCurrent;
         graphicsHealthbar.fillRectShape(rectangleHealthbar);
+
+        // End the game if health bar hits 0
+        if (healthbarCurrent <= 5){
+            this.registry.set('score', this.score);
+            this.scene.start('GameOver');
+        }
     }
 
     makeShapeMask(rectangleBarType, graphicsType)
@@ -235,7 +236,7 @@ export class Game extends Scene
         var smallShip = this.addShip('smallShip');
         smallShip.scoreValue = 5;
         this.smallShips.add(smallShip);
-        this.physics.moveToObject(smallShip, this.core, 50);
+        this.physics.moveToObject(smallShip, this.core, 500);
     }
 
     smallShipHitShield(shield, ship){

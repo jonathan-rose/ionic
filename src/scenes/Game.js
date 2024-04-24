@@ -40,10 +40,10 @@ export class Game extends Scene
         this.healthbarBackground.setDepth(3);
         this.healthbarForeground.setDepth(5);
 
-        keys = this.input.keyboard.addKeys({
-            'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
-            'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
-        });
+        // keys = this.input.keyboard.addKeys({
+        //     'enter': Phaser.Input.Keyboard.KeyCodes.ENTER,
+        //     'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
+        // });
 
         // Add power bar
         graphicsPowerbar = this.add.graphics({ fillStyle: { color: 0xdeb841 }});
@@ -88,10 +88,12 @@ export class Game extends Scene
         this.smallShips = this.physics.add.group();
 
         this.shieldSurface = this.physics.add.staticImage(512 - 100, 384 - 100, 'blank200').setCircle(200);
+        this.shieldSurface.radius = 200; // I'm so sorry
 
         // The shield disappears when firing allowing ships to get
         // close to the station.
-        this.physics.add.overlap(this.shieldSurface, this.smallShips, this.smallShipHitShield, (s, e) => {return !this.plasmaField.isFiring;}, this);
+        this.physics.add.overlap(this.shieldSurface, this.smallShips, this.smallShipHitShield, null, this);
+        // (s, e) => {return !this.plasmaField.isFiring;}
         
         this.shield = new Shield(
             this, 
@@ -135,8 +137,24 @@ export class Game extends Scene
         });
         this.bigShips = this.physics.add.group();
         this.physics.add.overlap(this.shieldSurface, this.bigShips, this.bigShipHitShield, null, this);
+
         // A group for the tendrils to interact with
         this.destroyableShips = this.physics.add.group();
+
+        // Screen wipe bomb with enter
+        this.bomb1 = this.add.image(850, 50, 'bomb');
+        this.bomb2 = this.add.image(900, 50, 'bomb');
+        this.bomb3 = this.add.image(950, 50, 'bomb');
+        this.bombs = [this.bomb1, this.bomb2, this.bomb3];
+        
+        this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+        this.enterKey.on('down', ()=> {
+            if (this.bombs.length > 0){
+                this.useBomb();
+                this.bombs.pop().destroy();
+            }
+            
+        });
 
         this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.destroyableShips, this.hitTendril, this.plasmaField.collisionProcessor, this);
 
@@ -153,8 +171,11 @@ export class Game extends Scene
         if (powerbarCurrent < powerbarMax){
             powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 1);
         }
+        if (healthbarCurrent < healthbarMax){
+            healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 1);
+        }
 
-        if (this.plasmaField.isFiring) {
+        if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen) {
             powerbarCurrent = Math.max(0, powerbarCurrent - plasmaConsumeRate);
         }
 
@@ -219,7 +240,9 @@ export class Game extends Scene
 
     smallShipHitShield(shield, ship){
         ship.destroy();
-        //healthbarCurrent = Math.max(0, healthbarCurrent - 10);
+        if (!this.plasmaField.isFiringFullScreen){
+            healthbarCurrent = Math.max(0, healthbarCurrent - 5);
+        }
     }
 
     hitTendril(plasmaField, ship) {
@@ -250,7 +273,7 @@ export class Game extends Scene
             healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 100);
         }
         ship.destroy();
-        // TODO: Add some nice animation or flurry of green plusses
+        // TODO: Add some nice animation or flurry of green/pink plusses
     }
 
     addBigShip(){
@@ -263,13 +286,45 @@ export class Game extends Scene
     bigShipHitShield(shield, ship){
         ship.body.velocity.x = 0;
         ship.body.velocity.y = 0;
-        healthbarCurrent = Math.max(0, healthbarCurrent - 100);
-
+        if (!this.plasmaField.isFiringFullScreen){
+            healthbarCurrent = Math.max(0, healthbarCurrent - 100);
+        }
         ship.destroy();
     }
 
     increaseScore(increase){
         this.score += increase;
         this.scoreText.setText('Score: ' + this.score);
+    }
+
+    useBomb(){
+        this.plasmaField.fullScreenTendrilsOn();
+        var screenWipeTimer = this.time.addEvent({
+            delay: 2000,
+            callback: this.plasmaField.fullScreenTendrilsOff,
+            callbackScope: this.plasmaField,
+            loop: false
+        });
+
+        // DO NOT TOUCH
+        // ONLY WORKS EXCATLY AS IS
+        // I am sorry
+
+        this.tweens.add({
+            targets: this.shieldSurface,
+            radius: 800,
+            duration: 2000,
+            onComplete: (tween, targets) => {                
+                targets[0].body.x = 512-(200);
+                targets[0].body.y = 384-(200);
+                targets[0].body.setCircle(200);
+                targets[0].radius = 200;
+            },
+            onUpdate: (tween, target, key, current) => {
+                target.body.setCircle(current);
+                target.body.x = 512-(current);
+                target.body.y = 384-(current);
+            }
+        });
     }
 }

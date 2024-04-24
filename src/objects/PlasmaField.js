@@ -18,6 +18,7 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         this.shieldRadius = 200;
         this.isFiring = false;
         this.isDepleted = false;
+        this.isFiringFullScreen = false;
 
         this.body = new Phaser.Physics.Arcade.StaticBody(this.scene.physics.world, this);
         this.body.x = 0;
@@ -196,5 +197,27 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
             return (enemy.spawnAngle > plasmaField.firingAngle - 15
                 && enemy.spawnAngle < plasmaField.firingAngle + 15);
         }
+    }
+
+    fullScreenTendrilsOn(){
+        this.isFiring = true;
+        this.isFiringFullScreen = true;
+        this.tendrils.forEach((t) => {
+            this.scene.tweens.add({
+                targets: t,
+                duration: 300,
+                onComplete: (tween, targets, field) => {
+                    field.isFiring = true;
+                    targets[0].radius = 700;
+                },
+                onCompleteParams: [this]
+            });
+        });
+    }
+
+    fullScreenTendrilsOff(){
+        this.isFiringFullScreen = false;
+        this.startFiring(0); //only briefly so that stop firing will work. Sorry.
+        this.stopFiring();
     }
 }

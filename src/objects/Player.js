@@ -65,7 +65,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             } else if (this.spaceKey.isUp || this.powerbarCurrent == 0 || this.powerbarCurrent < 0) {
                 this.isLanding = false;
                 this.setHover(this.defaultOrbitHoverDistance);
-                if (this.plasmaField.isFiring) {
+                if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen) {
                     this.plasmaField.stopFiring();
                     this.plasmaField.isFiring = false;
                 }

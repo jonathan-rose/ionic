@@ -15,30 +15,37 @@ export class GameOver extends Scene
 
         if (this.score > this.registry.get('highscore')){
             this.registry.set('highscore', this.score);
-            this.text = this.add.text(512, 200, 'New High Score!', {
+            this.text1 = this.add.text(512, 200, 'New High Score!', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
             }).setOrigin(0.5);
         }
 
-        this.text = this.add.text(512, 300, 'Score:', {
+        this.text2 = this.add.text(512, 300, 'Score:', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
 
-        this.text = this.add.text(512, 350, this.score, {
+        this.text3 = this.add.text(512, 350, this.score, {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
         
-        this.text = this.add.text(512, 460, 'Press Enter to Play Again', {
+        this.enterText = this.add.text(512, 460, 'Press Enter to Play Again', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
+
+        this.tweens.add({
+            targets: this.enterText,
+            alpha: 0.3,
+            yoyo: true,
+            repeat: -1
+        });
 
         this.input.keyboard.on('keydown-ENTER', () => {
             this.scene.start('Game');

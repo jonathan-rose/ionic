@@ -239,7 +239,7 @@ export class Game extends Scene
         var smallShip = this.addShip('smallShip');
         smallShip.scoreValue = 5;
         this.smallShips.add(smallShip);
-        this.physics.moveToObject(smallShip, this.core, 500);
+        this.physics.moveToObject(smallShip, this.core, 50);
     }
 
     smallShipHitShield(shield, ship){

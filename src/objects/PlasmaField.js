@@ -145,7 +145,7 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
             this.scene.tweens.add({
                 targets: t,
                 rotation: tweenDelta,
-                duration: 150,
+                duration: 100,
                 onComplete: (tween, targets, field) => {
                     targets[0].radius = 700;
                     // only need one tendril to do this bit

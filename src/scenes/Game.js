@@ -141,17 +141,12 @@ export class Game extends Scene
         // A group for the tendrils to interact with
         this.destroyableShips = this.physics.add.group();
 
-        // Set off screen wipe bomb with enter
-        this.bomb1 = this.add.image(500, 50, 'smallShip');
-        this.bomb2 = this.add.image(550, 50, 'smallShip');
-        this.bomb3 = this.add.image(600, 50, 'smallShip');
+        // Screen wipe bomb with enter
+        this.bomb1 = this.add.image(850, 50, 'bomb');
+        this.bomb2 = this.add.image(900, 50, 'bomb');
+        this.bomb3 = this.add.image(950, 50, 'bomb');
         this.bombs = [this.bomb1, this.bomb2, this.bomb3];
-        // this.bombCircle = new Phaser.Geom.Circle(
-        //     512,
-        //     380,
-        //     100
-        // );
-        //this.bombCollider = this.physics.add.overlap(this.shieldSurface, this.destroyableShips, (circle, ship) => {ship.destroy();}, null, this);
+        
         this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         this.enterKey.on('down', ()=> {
             if (this.bombs.length > 0){
@@ -171,14 +166,16 @@ export class Game extends Scene
 
     update () {
         this.player.update(powerbarCurrent);
-        console.log(this.shieldSurface.body.radius);
       
         // Currently constantly increases power and health
         if (powerbarCurrent < powerbarMax){
             powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 1);
         }
+        if (healthbarCurrent < healthbarMax){
+            healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 1);
+        }
 
-        if (this.plasmaField.isFiring) {
+        if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen) {
             powerbarCurrent = Math.max(0, powerbarCurrent - plasmaConsumeRate);
         }
 
@@ -243,7 +240,9 @@ export class Game extends Scene
 
     smallShipHitShield(shield, ship){
         ship.destroy();
-        //healthbarCurrent = Math.max(0, healthbarCurrent - 10);
+        if (!this.plasmaField.fullScreenTendrilsOn){
+            healthbarCurrent = Math.max(0, healthbarCurrent - 1);
+        }
     }
 
     hitTendril(plasmaField, ship) {
@@ -274,7 +273,7 @@ export class Game extends Scene
             healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 100);
         }
         ship.destroy();
-        // TODO: Add some nice animation or flurry of green plusses
+        // TODO: Add some nice animation or flurry of green/pink plusses
     }
 
     addBigShip(){
@@ -287,8 +286,9 @@ export class Game extends Scene
     bigShipHitShield(shield, ship){
         ship.body.velocity.x = 0;
         ship.body.velocity.y = 0;
-        healthbarCurrent = Math.max(0, healthbarCurrent - 100);
-
+        if (!this.plasmaField.fullScreenTendrilsOn){
+            healthbarCurrent = Math.max(0, healthbarCurrent - 100);
+        }
         ship.destroy();
     }
 
@@ -312,8 +312,8 @@ export class Game extends Scene
 
         this.tweens.add({
             targets: this.shieldSurface,
-            radius: 1000,
-            duration: 1000,
+            radius: 800,
+            duration: 2000,
             onComplete: (tween, targets) => {                
                 targets[0].body.x = 512-(200);
                 targets[0].body.y = 384-(200);

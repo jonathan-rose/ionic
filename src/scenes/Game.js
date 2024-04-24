@@ -202,6 +202,15 @@ export class Game extends Scene
         );
         ship.setDepth(1);
         ship.spawnAngle = spawnAngle;
+        if (sprite == 'healthShipExplosion') {
+            var healthParticles = this.add.particles(0, 0, 'healthSign', {
+                speed: 50,
+                scale: {start: 1, end: 0},
+                blendMode: 'ADD'
+            });
+            healthParticles.startFollow(ship);
+            ship.particles = healthParticles;
+        }
 
         // rotate to face centre
         const angleDeg = Math.atan2(this.randomCirclePos.y - this.core.y, this.randomCirclePos.x - this.core.x) * 180 / Math.PI;
@@ -242,6 +251,7 @@ export class Game extends Scene
 
         ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
             ship.destroy();
+            ship.particles.stop();
         }, this);
     }
 

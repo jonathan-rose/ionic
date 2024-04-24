@@ -29,8 +29,9 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
-        // @TODO: update this with final version when ready
         this.load.audio('music', 'planet-power.mp3');
+        this.load.audio('beamFiring', 'beam-firing.ogg');
+        this.load.audio('explosion', 'explosion.wav');
 
         this.load.image('logo', 'logo.png');
         this.load.image('player', 'player.png');

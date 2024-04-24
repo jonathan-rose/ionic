@@ -21,6 +21,13 @@ export class MainMenu extends Scene
             align: 'center'
         }).setOrigin(0.5).setVisible(false);
 
+        this.tweens.add({
+            targets: this.text,
+            alpha: 0.3,
+            yoyo: true,
+            repeat: -1
+        });
+
         this.input.keyboard.on('keydown-SPACE', () => {
             this.scene.start('Game');
         });

@@ -126,38 +126,56 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         }
 
         this.tendrils.forEach((t) => {
-            t.previousRotation = t.rotation;
             t.previousRotationSpeed = t.rotationSpeed;
             t.rotationSpeed = 0;
             t.rotationSpeedTween.pause();
 
-            // Try and make sure the tendrils choose the shortest direction
-            let target = angle;
-            if (angle - t.rotation < -180) {
-                target = angle + 360;
+            // find the shortest distance between the two angles
+            let delta = Util.mod((this.firingAngle - t.rotation + 180), 360) - 180;
+            if (delta < -180) {
+                delta += 360;
+            }
+
+            // make the delta into a relative tween value string
+            let tweenDelta = "+=" + delta;
+            if (delta < 0) {
+                tweenDelta = "-=" + (0 - delta);
             }
 
             this.scene.tweens.add({
                 targets: t,
-                rotation: target,
-                duration: 300,
+                rotation: tweenDelta,
+                duration: 150,
                 onComplete: (tween, targets, field) => {
-                    field.isFiring = true;
                     targets[0].radius = 700;
+                    // only need one tendril to do this bit
+                    if (!field.isFiring) {
+                        field.isFiring = true;
+                        if (!field.scene.beamFiringSoundPlaying) {
+                            field.scene.beamFiringSound.play();
+                            field.scene.beamFiringSoundPlaying = true;
+                        }
+                    }
                 },
                 onCompleteParams: [this]
             });
         });
     }
 
-    // @TODO: when we do this we should check which direction the tendril should travel
     stopFiring() {
+        // turn off beamFiring sound
+        let s = this.scene.beamFiringSound;
+        if (s && s.isPlaying) {
+            s.stop();
+        }
+        this.scene.beamFiringSoundPlaying = false;
+
         this.isFiring = false;
         this.tendrils.forEach((t) => {
             t.radius = this.shieldRadius;
             this.scene.tweens.add({
                 targets: t,
-                rotation: t.previousRotation,
+                rotation: "+=" + Util.randBetween(-180, 180),
                 duration: 300,
                 onComplete: (tween, targets) => {
                     targets[0].rotationSpeed = targets[0].previousRotationSpeed;

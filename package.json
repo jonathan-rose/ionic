@@ -1,5 +1,5 @@
 {
-    "name": "template-webpack",
+    "name": "IONCLAD",
     "version": "3.1.1",
     "main": "src/main.js",
     "scripts": {
@@ -8,15 +8,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/phaserjs/template-webpack.git"
+        "url": "git+https://github.com/jonathan-rose/ionic.git"
     },
-    "author": "Phaser Studio <support@phaser.io> (https://phaser.io/)",
+    "author": "Cartwheel Interactive",
     "license": "MIT",
     "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
-    "bugs": {
-        "url": "https://github.com/phaserjs/template-webpack/issues"
-    },
-    "homepage": "https://github.com/phaserjs/template-webpack#readme",
+    "homepage": "https://github.com/jonathan-rose/ionic#readme",
     "devDependencies": {
         "@babel/core": "^7.23.9",
         "@babel/preset-env": "^7.23.9",

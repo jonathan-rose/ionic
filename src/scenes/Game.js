@@ -25,6 +25,9 @@ export class Game extends Scene
     create () {    
         this.add.image(512, 384, 'background');
 
+        this.beamFiringSound = this.sound.add('beamFiring');
+        this.beamFiringSoundPlaying = false;
+
         this.plasmaField = new PlasmaField(this);
         this.plasmaField.isFiring = false;
 

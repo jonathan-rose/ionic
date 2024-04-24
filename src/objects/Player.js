@@ -77,6 +77,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.cooldownTimer = this.scene.time.delayedCall(this.cooldownLength, () => {
                 this.cooldownState = false;
             }, [], this);
+            this.plasmaField.isDepleted = true;
         }
 
         if (this.cooldownState == true && this.flashRunning == false) {
@@ -93,6 +94,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.depleted = true;
         } else if (this.powerbarCurrent >= this.powerbarMinimum) {
             this.depleted = false;
+            this.plasmaField.isDepleted = false;
         }
 
         if (this.cursors.left.isDown) {

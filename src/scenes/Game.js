@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import Player from '../objects/Player';
 import Shield from '../objects/Shield';
 import PlasmaField from '../objects/PlasmaField';
+import EnemySpawnManager from '../objects/EnemySpawnManager';
 import Util from '../util.js';
 
 var keys;
@@ -110,13 +111,6 @@ export class Game extends Scene
         );
         this.player.setDepth(5);
 
-        var healthShiptimer = this.time.addEvent({
-            delay: 5000,
-            callback: this.addHealthShip,
-            callbackScope: this,
-            loop: true
-        });
-
         this.healthShips = this.physics.add.group();
         this.anims.create({
             key: 'explode',
@@ -126,12 +120,6 @@ export class Game extends Scene
         this.physics.add.overlap(this.shieldSurface, this.healthShips, this.healthShipHitShield, this.outerShieldCollisionProcessor, this);
         this.physics.add.overlap(this.player, this.healthShips, this.collectHealthShip, null, this);
 
-        var bigShiptimer = this.time.addEvent({
-            delay: 4000,
-            callback: this.addBigShip,
-            callbackScope: this,
-            loop: true
-        });
         this.bigShips = this.physics.add.group();
         this.physics.add.overlap(this.shieldSurface, this.bigShips, this.bigShipHitShield, this.outerShieldCollisionProcessor, this);
 
@@ -150,7 +138,11 @@ export class Game extends Scene
                 this.useBomb();
                 this.bombs.pop().destroy();
             }
-            
+        });
+
+        this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+        this.rKey.on('down', ()=> {
+            this.spawner.spawnPattern(this, Util.randNth(Array.from(this.spawner.patterns.keys())));
         });
 
         this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.destroyableShips, this.hitTendril, this.plasmaField.collisionProcessor, this);
@@ -161,6 +153,9 @@ export class Game extends Scene
         this.scoreText = this.add.text(16, 46, 'score: 0', { fontSize: '32px', fill: '#FFF' });
         this.scoreText.setDepth(5);
         this.score = 0;
+
+        // Manage ramping difficulty and stuff
+        this.spawner = new EnemySpawnManager(this);
     }
 
     update () {
@@ -177,8 +172,6 @@ export class Game extends Scene
         if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen) {
             powerbarCurrent = Math.max(0, powerbarCurrent - plasmaConsumeRate);
         }
-
-        this.addSmallShip();
 
         this.plasmaField.update();
         this.plasmaField.draw();
@@ -217,28 +210,38 @@ export class Game extends Scene
         graphicsType.setMask(mask);
     }
 
-    addShip(sprite){
+    addShip(sprite, spawnAngle = null, distance = null) {
+        if (spawnAngle == null) {
+            spawnAngle = Util.randBetween(0, 360);
+        }
+        spawnAngle = Util.mod(spawnAngle, 360);
+
+        if (distance == null) {
+            distance = 700;
+        }
+
         this.start = new Phaser.Math.Vector2(512, 384);
-        let spawnAngle = Util.randBetween(0, 360);
-        this.randomCirclePos = Util.offsetByTrig(this.start, spawnAngle, 700); //start, angle, distance
+        this.circlePos = Util.offsetByTrig(this.start, spawnAngle, distance); //start, angle, distance
         var ship = this.physics.add.sprite(
-            this.randomCirclePos.x, 
-            this.randomCirclePos.y, 
+            this.circlePos.x,
+            this.circlePos.y,
             sprite
         );
         ship.setDepth(1);
         ship.spawnAngle = spawnAngle;
 
         // rotate to face centre
-        const angleDeg = Math.atan2(this.randomCirclePos.y - this.core.y, this.randomCirclePos.x - this.core.x) * 180 / Math.PI;
+        const angleDeg = Math.atan2(this.circlePos.y - this.core.y, this.circlePos.x - this.core.x) * 180 / Math.PI;
         ship.angle = angleDeg-90;
         this.destroyableShips.add(ship);
         return ship;
     }
 
-    addSmallShip(){
-        var smallShip = this.addShip('smallShip');
+    addSmallShip(spawnAngle = null, distance = null) {
+        let smallShip = this.addShip('smallShip', spawnAngle, distance);
+        smallShip.shipType = 'small';
         smallShip.scoreValue = 5;
+        smallShip.coreDamage = 10;
         this.smallShips.add(smallShip);
         this.physics.moveToObject(smallShip, this.core, 50);
     }
@@ -256,15 +259,27 @@ export class Game extends Scene
     }
 
     hitCore(core, ship) {
-        // @TODO: shake screen?
-        // @TODO: die??
+        healthbarCurrent = Math.max(0, healthbarCurrent - ship.coreDamage);
+        switch (ship.shipType) {
+            case 'small':
+                this.cameras.main.shake(100, 0.005);
+                break;
+            case 'health':
+                this.cameras.main.shake(100, 0.01);
+                break;
+            case 'big':
+                this.cameras.main.shake(200, 0.03);
+                break;
+        }
         // @TODO: animate ship death?
         ship.destroy();
     }
 
-    addHealthShip(){
+    addHealthShip() {
         var healthShip = this.addShip('healthShipExplosion');
+        healthShip.shipType = 'health';
         healthShip.scoreValue = 0;
+        healthShip.coreDamage = 20;
         this.healthShips.add(healthShip);
         this.physics.moveToObject(healthShip, this.core, 40);
     }
@@ -288,9 +303,11 @@ export class Game extends Scene
         // TODO: Add some nice animation or flurry of green/pink plusses
     }
 
-    addBigShip(){
+    addBigShip() {
         var bigShip = this.addShip('bigShip');
+        bigShip.shipType = 'big';
         bigShip.scoreValue = 100;
+        bigShip.coreDamage = 200;
         this.bigShips.add(bigShip);
         this.physics.moveToObject(bigShip, this.core, 40);
     }

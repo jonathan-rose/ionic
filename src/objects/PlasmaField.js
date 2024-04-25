@@ -125,7 +125,6 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         }
     }
 
-    // @TODO: we should make the wiggles straighter when firing so the tendrils will easily fit through our cannon aperture.
     startFiring(angle) {
         if (angle < 0) {
             this.firingAngle = angle + 360;

@@ -16,27 +16,39 @@ export class GameOver extends Scene
         if (this.score > this.registry.get('highscore')){
             this.registry.set('highscore', this.score);
             this.text1 = this.add.text(512, 200, 'New High Score!', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
+                fontFamily: 'nau_searegular',
+                fontSize: 38,
+                color: '#ffffff',
+                stroke: '#000000',
+                strokeThickness: 8,
+                align: 'center'
             }).setOrigin(0.5);
         }
 
         this.text2 = this.add.text(512, 300, 'Score:', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
+            fontFamily: 'nau_searegular',
+            fontSize: 38,
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
 
         this.text3 = this.add.text(512, 350, this.score, {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
+            fontFamily: 'nau_searegular',
+            fontSize: 38,
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
         
         this.enterText = this.add.text(512, 460, 'Press Space to Play Again', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
+            fontFamily: 'nau_searegular',
+            fontSize: 38,
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
 

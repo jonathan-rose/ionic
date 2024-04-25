@@ -22,10 +22,20 @@ export class Preloader extends Scene
             bar.width = 4 + (460 * progress);
 
         });
+
+        // Create style rules to let us use a custom font.
+        const element = document.createElement('style');
+        document.head.appendChild(element);
+        const sheet = element.sheet;
+        let styles = '@font-face { font-family: "nau_searegular"; src: url("fonts/nausea-yemm-webfont.woff2") format("woff2"), url("fonts/nausea-yemm-webfont.woff") format("woff"); }\n';
+        sheet.insertRule(styles, 0);
     }
 
     preload ()
     {
+        // webfont script
+        this.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
+
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
@@ -51,10 +61,15 @@ export class Preloader extends Scene
 
     create ()
     {
-        //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
-        //  For example, you can define global animations here, so we can use them in other scenes.
-
-        //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        this.scene.start('MainMenu');
+        // Ensure the custom font is available everywhere.
+        const add = this.add;
+        WebFont.load({
+            custom: {
+                families: ['nau_searegular']
+            },
+            active: () => {
+                this.scene.start('MainMenu');
+            }
+        });
     }
 }

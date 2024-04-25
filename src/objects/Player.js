@@ -96,7 +96,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 callback: this.toggleTint,
                 callbackScope: this,
                 loop: true
-            })
+            });
         }
 
         if (this.powerbarCurrent <= 0) {

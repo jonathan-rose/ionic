@@ -34,7 +34,7 @@ export class GameOver extends Scene
             align: 'center'
         }).setOrigin(0.5);
         
-        this.enterText = this.add.text(512, 460, 'Press Enter to Play Again', {
+        this.enterText = this.add.text(512, 460, 'Press Space to Play Again', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
@@ -47,7 +47,7 @@ export class GameOver extends Scene
             repeat: -1
         });
 
-        this.input.keyboard.on('keydown-ENTER', () => {
+        this.input.keyboard.on('keydown-SPACE', () => {
             this.scene.start('Game');
         });
     }

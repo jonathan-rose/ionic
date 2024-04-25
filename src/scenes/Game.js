@@ -88,10 +88,7 @@ export class Game extends Scene
         this.shieldSurface = this.physics.add.staticImage(512 - 100, 384 - 100, 'blank200').setCircle(200);
         this.shieldSurface.radius = 200; // I'm so sorry
 
-        // The shield disappears when firing allowing ships to get
-        // close to the station.
-        this.physics.add.overlap(this.shieldSurface, this.smallShips, this.smallShipHitShield, null, this);
-        // (s, e) => {return !this.plasmaField.isFiring;}
+        this.physics.add.overlap(this.shieldSurface, this.smallShips, this.smallShipHitShield, this.outerShieldCollisionProcessor, this);
         
         this.shield = new Shield(
             this, 
@@ -111,7 +108,7 @@ export class Game extends Scene
         );
         this.player.setDepth(5);
 
-	    var healthShiptimer = this.time.addEvent({
+        var healthShiptimer = this.time.addEvent({
             delay: 5000,
             callback: this.addHealthShip,
             callbackScope: this,
@@ -124,7 +121,7 @@ export class Game extends Scene
             frames: this.anims.generateFrameNumbers('healthShipExplosion', { start: 0, end: 7 }),
             frameRate: 10
         });
-        this.physics.add.overlap(this.shieldSurface, this.healthShips, this.healthShipHitShield, null, this);
+        this.physics.add.overlap(this.shieldSurface, this.healthShips, this.healthShipHitShield, this.outerShieldCollisionProcessor, this);
         this.physics.add.overlap(this.player, this.healthShips, this.collectHealthShip, null, this);
 
         var bigShiptimer = this.time.addEvent({
@@ -134,15 +131,15 @@ export class Game extends Scene
             loop: true
         });
         this.bigShips = this.physics.add.group();
-        this.physics.add.overlap(this.shieldSurface, this.bigShips, this.bigShipHitShield, null, this);
+        this.physics.add.overlap(this.shieldSurface, this.bigShips, this.bigShipHitShield, this.outerShieldCollisionProcessor, this);
 
         // A group for the tendrils to interact with
         this.destroyableShips = this.physics.add.group();
 
         // Screen wipe bomb with enter
-        this.bomb1 = this.add.image(850, 50, 'bomb');
-        this.bomb2 = this.add.image(900, 50, 'bomb');
-        this.bomb3 = this.add.image(950, 50, 'bomb');
+        this.bomb1 = this.add.image(850, 50, 'bomb').setDepth(10);
+        this.bomb2 = this.add.image(900, 50, 'bomb').setDepth(10);
+        this.bomb3 = this.add.image(950, 50, 'bomb').setDepth(10);
         this.bombs = [this.bomb1, this.bomb2, this.bomb3];
         
         this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
@@ -155,6 +152,8 @@ export class Game extends Scene
         });
 
         this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.destroyableShips, this.hitTendril, this.plasmaField.collisionProcessor, this);
+
+        this.coreCollider = this.physics.add.overlap(this.core, this.destroyableShips, this.hitCore, null, this);
 
         //  The score
         this.scoreText = this.add.text(16, 46, 'score: 0', { fontSize: '32px', fill: '#FFF' });
@@ -245,13 +244,20 @@ export class Game extends Scene
     smallShipHitShield(shield, ship){
         ship.destroy();
         if (!this.plasmaField.isFiringFullScreen){
-            healthbarCurrent = Math.max(0, healthbarCurrent - 5);
+            healthbarCurrent = Math.max(0, healthbarCurrent - 1.5);
         }
     }
 
     hitTendril(plasmaField, ship) {
         ship.destroy();
         this.increaseScore(ship.scoreValue);
+    }
+
+    hitCore(core, ship) {
+        // @TODO: shake screen?
+        // @TODO: die??
+        // @TODO: animate ship death?
+        ship.destroy();
     }
 
     addHealthShip(){
@@ -302,6 +308,16 @@ export class Game extends Scene
     }
 
     useBomb(){
+        this.sound.play('explosion');
+        this.tweens.add({
+            targets: this.plasmaField,
+            shieldRadius: 800,
+            duration: 2000,
+            onComplete: (t, targets) => {
+                targets[0].shieldRadius = 200;
+            }
+        });
+        
         this.plasmaField.fullScreenTendrilsOn();
         var screenWipeTimer = this.time.addEvent({
             delay: 2000,
@@ -330,5 +346,9 @@ export class Game extends Scene
                 target.body.y = 384-(current);
             }
         });
+    }
+
+    outerShieldCollisionProcessor(a, b) {
+        return this.plasmaField.isFiringFullScreen || !(this.plasmaField.isDepleted || this.plasmaField.isFiring);
     }
 }

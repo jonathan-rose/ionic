@@ -41,7 +41,11 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
     draw() {
         this.graphics.clear();
 
-        if (this.isFiring) {
+        if (this.isFiringFullScreen) {
+            this.drawShieldOuter();
+            this.drawShieldInner();
+            this.drawTendrils();
+        } else if (this.isFiring) {
             this.drawShieldInner();
             this.drawTendrils();
         } else {
@@ -52,7 +56,7 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
     }
 
     drawTendrils() {
-        if (this.isDepleted == false) {
+        if (this.isFiringFullScreen || !this.isDepleted) {
             this.tendrils.forEach((t) => {
                 this.drawGradientCurve(t.curve, 0xE54489, 18);
                 this.drawGradientCurve(t.curve, 0xE54489, 18, true);
@@ -67,26 +71,30 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
     }
 
     drawShieldOuter() {
-        // black ring to cut off the end of the tendrils
-        this.graphics.lineStyle(20, 0x0, 1);
-        this.graphics.beginPath();
-        this.graphics.arc(512, 383, this.shieldRadius * 1.007, 0, Phaser.Math.DegToRad(360));
-        this.graphics.closePath();
-        this.graphics.strokePath();
+        if (!this.isFiringFullScreen) {
+            // black ring to cut off the end of the tendrils
+            this.graphics.lineStyle(20, 0x0, 1);
+            this.graphics.beginPath();
+            this.graphics.arc(512, 383, this.shieldRadius * 1.007, 0, Phaser.Math.DegToRad(360));
+            this.graphics.closePath();
+            this.graphics.strokePath();
+        }
 
-        // draw the shield as a pink ring
-        this.graphics.lineStyle(3, 0xE54489, 1);
-        this.graphics.beginPath();
-        this.graphics.arc(512, 383, this.shieldRadius * 0.96, 0, Phaser.Math.DegToRad(360));
-        this.graphics.closePath();
-        this.graphics.strokePath();
+        if (this.isFiringFullScreen || !this.isDepleted) {
+            // draw the shield as a pink ring
+            this.graphics.lineStyle(3, 0xE54489, 1);
+            this.graphics.beginPath();
+            this.graphics.arc(512, 383, this.shieldRadius * 0.96, 0, Phaser.Math.DegToRad(360));
+            this.graphics.closePath();
+            this.graphics.strokePath();
 
-        // inner ring
-        this.graphics.lineStyle(3, 0xE54489, 1);
-        this.graphics.beginPath();
-        this.graphics.arc(512, 383, 40, 0, Phaser.Math.DegToRad(360));
-        this.graphics.closePath();
-        this.graphics.strokePath();
+            // inner ring
+            this.graphics.lineStyle(3, 0xE54489, 1);
+            this.graphics.beginPath();
+            this.graphics.arc(512, 383, 40, 0, Phaser.Math.DegToRad(360));
+            this.graphics.closePath();
+            this.graphics.strokePath();
+        }
     }
 
     drawShieldInner() {

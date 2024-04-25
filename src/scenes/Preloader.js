@@ -37,6 +37,9 @@ export class Preloader extends Scene
         this.load.image('player', 'player.png');
         this.load.image('bar-background', 'barBackground.png');
         this.load.image('bar-foreground', 'barForeground.png');
+        this.load.image('powerText', 'powerText.png');
+        this.load.image('shieldText', 'shieldText.png');
+        
         this.load.image('smallShip', 'enemy.png');
         this.load.image('station', 'spaceStation.png');
         this.load.image('blank200', 'empty200x200.png');

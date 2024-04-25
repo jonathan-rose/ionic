@@ -35,11 +35,13 @@ export class Game extends Scene
 
         this.powerbarBackground = this.add.image(950, 400, 'bar-background');
         this.powerbarForeground = this.add.image(950, 400, 'bar-foreground');
+        this.powerText = this.add.image(950, 400, 'powerText').setDepth(5);
         this.powerbarBackground.setDepth(3);
         this.powerbarForeground.setDepth(5);
 
         this.healthbarBackground = this.add.image(75, 400, 'bar-background');
         this.healthbarForeground = this.add.image(75, 400, 'bar-foreground');
+        this.shieldText = this.add.image(75, 400, 'shieldText').setDepth(5);
         this.healthbarBackground.setDepth(3);
         this.healthbarForeground.setDepth(5);
 

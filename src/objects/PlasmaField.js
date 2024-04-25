@@ -43,7 +43,7 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
     draw() {
         this.graphics.clear();
 
-        if (this.isFiringFullScreen) {
+        if (this.isFiringFullScreen || this.bigTendrilOverShieldHack) {
             this.drawShieldOuter();
             this.drawShieldInner();
             this.drawTendrils();
@@ -178,10 +178,21 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
             s.stop();
         }
         this.scene.beamFiringSoundPlaying = false;
-
         this.isFiring = false;
+        this.bigTendrilOverShieldHack = true;
+
+        this.scene.time.addEvent({
+            delay: 10,
+            callback: () => {
+                this.bigTendrilOverShieldHack = false;
+                this.tendrils.forEach((t) => {
+                    t.radius = this.shieldRadius;
+                });
+            },
+            callbackScope: this,
+        });
+
         this.tendrils.forEach((t) => {
-            t.radius = this.shieldRadius;
             this.scene.tweens.add({
                 targets: t,
                 rotation: "+=" + Util.randBetween(-180, 180),

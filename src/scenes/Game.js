@@ -311,6 +311,7 @@ export class Game extends Scene
         healthShip.scoreValue = 0;
         healthShip.coreDamage = 20;
         healthShip.deathAnim = 'explodeHealth'
+        healthShip.setDepth(2);
         this.healthShips.add(healthShip);
         this.physics.moveToObject(healthShip, this.core, 40);
     }
@@ -340,6 +341,7 @@ export class Game extends Scene
         bigShip.scoreValue = 100;
         bigShip.coreDamage = 200;
         bigShip.deathAnim = 'bigShipExplosion';
+        bigShip.setDepth(2);
         this.bigShips.add(bigShip);
         this.physics.moveToObject(bigShip, this.core, 40);
     }

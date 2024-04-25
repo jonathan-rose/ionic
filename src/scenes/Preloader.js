@@ -42,6 +42,7 @@ export class Preloader extends Scene
         this.load.audio('music', 'planet-power.mp3');
         this.load.audio('beamFiring', 'beam-firing.ogg');
         this.load.audio('explosion', 'explosion.wav');
+        this.load.audio('coreDeathExplosion', 'core-death-explosion.wav');
 
         this.load.image('logo', 'logo.png');
         this.load.image('player', 'player.png');

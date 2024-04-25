@@ -140,11 +140,6 @@ export class Game extends Scene
             }
         });
 
-        this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-        this.rKey.on('down', ()=> {
-            this.spawner.spawnPattern(this, Util.randNth(Array.from(this.spawner.patterns.keys())));
-        });
-
         this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.destroyableShips, this.hitTendril, this.plasmaField.collisionProcessor, this);
 
         this.coreCollider = this.physics.add.overlap(this.core, this.destroyableShips, this.hitCore, null, this);
@@ -194,7 +189,7 @@ export class Game extends Scene
         // End the game if health bar hits 0
         if (healthbarCurrent <= 5){
             this.registry.set('score', this.score);
-            this.scene.start('GameOver');
+            this.gameOverTransition();
         }
     }
 
@@ -330,7 +325,7 @@ export class Game extends Scene
         this.scoreText.setText('Score: ' + this.score);
     }
 
-    useBomb(){
+    useBomb() {
         this.sound.play('explosion');
         this.tweens.add({
             targets: this.plasmaField,
@@ -373,5 +368,49 @@ export class Game extends Scene
 
     outerShieldCollisionProcessor(a, b) {
         return this.plasmaField.isFiringFullScreen || !(this.plasmaField.isDepleted || this.plasmaField.isFiring);
+    }
+
+    gameOverTransition() {
+        this.sound.play('coreDeathExplosion');
+        this.plasmaField.fullScreenTendrilsOn();
+
+        let cam = this.cameras.main;
+        let fadeOutTime = 3500;
+        cam.fadeOut(fadeOutTime, 255, 255, 255);
+
+        let graphics = this.add.graphics({fillStyle: {color: 0xffffff}}).setDepth(100);
+        let explosionDisc = new Phaser.Geom.Ellipse(512, 384, 0, 10);
+        let explosionSphere = new Phaser.Geom.Circle(512, 384, 0);
+
+        this.tweens.add({
+            targets: explosionDisc,
+            width: 5000,
+            duration: 500,
+            delay: 1000,
+            ease: 'Sine.easeInOut',
+            onUpdate: () => {
+                graphics.clear();
+                graphics.fillEllipseShape(explosionDisc);
+            }
+        });
+
+        this.tweens.add({
+            targets: explosionSphere,
+            radius: 1000,
+            duration: 1000,
+            delay: 2000,
+            ease: 'Sine.easeInOut',
+            onUpdate: () => {
+                graphics.clear();
+                graphics.fillEllipseShape(explosionDisc);
+                graphics.fillCircleShape(explosionSphere);
+            }
+        });
+
+        this.time.addEvent({
+            delay: fadeOutTime,
+            callback: () => {this.scene.start('GameOver');},
+            callbackScope: this
+        });
     }
 }

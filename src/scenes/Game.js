@@ -49,7 +49,7 @@ export class Game extends Scene
         this.healthbarForeground.setDepth(5);
 
         // Add power bar
-        graphicsPowerbar = this.add.graphics({ fillStyle: { color: 0xdeb841 }});
+        graphicsPowerbar = this.add.graphics({ fillStyle: { color: 0x5557dd }}); // 0xdeb841
         graphicsPowerbar.setDepth(4);
         rectanglePowerbar = new Phaser.Geom.Rectangle(
             this.powerbarForeground.getTopLeft().x,
@@ -63,7 +63,7 @@ export class Game extends Scene
         this.makeShapeMask(rectanglePowerbar, graphicsPowerbar);
 
         this.powerbarMinimum = 100;
-        this.graphicsPowerbarMinimum = this.add.graphics ({ fillStyle: {color: 0xff0000, alpha: 0.5}});
+        this.graphicsPowerbarMinimum = this.add.graphics ({ fillStyle: {color: 0xff0000, alpha: 0.7}});
         this.graphicsPowerbarMinimum.fillRect(
             this.powerbarForeground.getBottomLeft().x,
             this.powerbarForeground.getBottomLeft().y - this.powerbarMinimum,
@@ -89,6 +89,11 @@ export class Game extends Scene
         this.makeShapeMask(rectangleHealthbar, graphicsHealthbar);
 
         this.smallShips = this.physics.add.group();
+        this.anims.create({
+            key: 'explodeSmall',
+            frames: this.anims.generateFrameNumbers('smallShipExplosion', { start: 0, end: 2 }),
+            frameRate: 10
+        });
 
         this.shieldSurface = this.physics.add.staticImage(512 - 100, 384 - 100, 'blank200').setCircle(200);
         this.shieldSurface.radius = 200; // I'm so sorry
@@ -115,7 +120,7 @@ export class Game extends Scene
 
         this.healthShips = this.physics.add.group();
         this.anims.create({
-            key: 'explode',
+            key: 'explodeHealth',
             frames: this.anims.generateFrameNumbers('healthShipExplosion', { start: 0, end: 7 }),
             frameRate: 10
         });
@@ -249,20 +254,31 @@ export class Game extends Scene
         smallShip.shipType = 'small';
         smallShip.scoreValue = 5;
         smallShip.coreDamage = 10;
+        smallShip.deathAnim = 'explodeSmall';
         this.smallShips.add(smallShip);
         this.physics.moveToObject(smallShip, this.core, 50);
     }
 
     smallShipHitShield(shield, ship){
-        ship.destroy();
         if (!this.plasmaField.isFiringFullScreen){
             healthbarCurrent = Math.max(0, healthbarCurrent - 1.1);
         }
+        ship.body.velocity.x = 0;
+        ship.body.velocity.y = 0;
+        ship.anims.play('explodeSmall', true);
+        ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
+            ship.destroy();
+        }, this);
     }
 
     hitTendril(plasmaField, ship) {
-        ship.destroy();
+        ship.body.velocity.x = 0;
+        ship.body.velocity.y = 0;
         this.increaseScore(ship.scoreValue);
+        ship.anims.play(ship.deathAnim, true);
+        ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
+            ship.destroy();
+        }, this);
     }
 
     hitCore(core, ship) {
@@ -287,6 +303,7 @@ export class Game extends Scene
         healthShip.shipType = 'health';
         healthShip.scoreValue = 0;
         healthShip.coreDamage = 20;
+        healthShip.deathAnim = 'explodeHealth'
         this.healthShips.add(healthShip);
         this.physics.moveToObject(healthShip, this.core, 40);
     }
@@ -295,8 +312,7 @@ export class Game extends Scene
         ship.body.velocity.x = 0;
         ship.body.velocity.y = 0;
 
-        ship.anims.play('explode', true);
-
+        ship.anims.play('explodeHealth', true);
         ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
             ship.destroy();
         }, this);
@@ -315,6 +331,7 @@ export class Game extends Scene
         bigShip.shipType = 'big';
         bigShip.scoreValue = 100;
         bigShip.coreDamage = 200;
+        bigShip.deathAnim = 'explodeHealth';
         this.bigShips.add(bigShip);
         this.physics.moveToObject(bigShip, this.core, 40);
     }
@@ -325,7 +342,13 @@ export class Game extends Scene
         if (!this.plasmaField.isFiringFullScreen){
             healthbarCurrent = Math.max(0, healthbarCurrent - 100);
         }
-        ship.destroy();
+
+        // UPDATE EXPLOSION SPRITE
+
+        ship.anims.play('explodeHealth', true);
+        ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
+            ship.destroy();
+        }, this);
     }
 
     increaseScore(increase){

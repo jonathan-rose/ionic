@@ -24,6 +24,8 @@ export class Game extends Scene
     }
 
     create () {
+        this.gameEnding = false;
+
         this.add.image(512, 384, 'background');
 
         this.beamFiringSound = this.sound.add('beamFiring');
@@ -81,8 +83,8 @@ export class Game extends Scene
             this.healthbarForeground.width,
             this.healthbarForeground.height
         );
-        healthbarCurrent = 600;
-        healthbarMax = 600;
+        healthbarCurrent = 546;
+        healthbarMax = 546;
 
         this.makeShapeMask(rectangleHealthbar, graphicsHealthbar);
 
@@ -140,11 +142,17 @@ export class Game extends Scene
             }
         });
 
+        // @NOTE debugging key event to end the game
+        // this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+        // this.rKey.on('down', ()=> {
+        //     this.gameOverTransition();
+        // });
+
         this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.destroyableShips, this.hitTendril, this.plasmaField.collisionProcessor, this);
 
         this.coreCollider = this.physics.add.overlap(this.core, this.destroyableShips, this.hitCore, null, this);
 
-        //  The score
+        // The score
         this.scoreText = this.add.text(16, 46, 'score: 0', {
             fontFamily: 'nau_searegular',
             fontSize: '32px',
@@ -161,14 +169,14 @@ export class Game extends Scene
         this.player.update(powerbarCurrent);
 
         // Currently constantly increases power and health
-        if (powerbarCurrent < powerbarMax){
+        if (powerbarCurrent < powerbarMax && !this.gameEnding) {
             powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 1);
         }
-        if (healthbarCurrent < healthbarMax){
-            healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 1);
+        if (healthbarCurrent < healthbarMax && !this.gameEnding) {
+            healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 0.3);
         }
 
-        if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen) {
+        if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen && !this.gameEnding) {
             powerbarCurrent = Math.max(0, powerbarCurrent - plasmaConsumeRate);
         }
 
@@ -248,7 +256,7 @@ export class Game extends Scene
     smallShipHitShield(shield, ship){
         ship.destroy();
         if (!this.plasmaField.isFiringFullScreen){
-            healthbarCurrent = Math.max(0, healthbarCurrent - 1.5);
+            healthbarCurrent = Math.max(0, healthbarCurrent - 1.1);
         }
     }
 
@@ -296,7 +304,7 @@ export class Game extends Scene
 
     collectHealthShip(player, ship){
         if (healthbarCurrent < healthbarMax){
-            healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 100);
+            healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 300);
         }
         ship.destroy();
         // TODO: Add some nice animation or flurry of green/pink plusses
@@ -371,8 +379,22 @@ export class Game extends Scene
     }
 
     gameOverTransition() {
+
         this.sound.play('coreDeathExplosion');
         this.plasmaField.fullScreenTendrilsOn();
+
+        // give the tendrils a sec to be big before freezing them.
+        this.time.addEvent({
+            delay: 300,
+            callback: () => {this.gameEnding = true;},
+            callbackScope: this
+        });
+
+        // freeze all enemy ships
+        this.destroyableShips.children.getArray().forEach((s) => {
+            s.body.velocity.x = 0;
+            s.body.velocity.y = 0;
+        });
 
         let cam = this.cameras.main;
         let fadeOutTime = 3500;

@@ -150,7 +150,11 @@ export class Game extends Scene
         this.coreCollider = this.physics.add.overlap(this.core, this.destroyableShips, this.hitCore, null, this);
 
         //  The score
-        this.scoreText = this.add.text(16, 46, 'score: 0', { fontSize: '32px', fill: '#FFF' });
+        this.scoreText = this.add.text(16, 46, 'score: 0', {
+            fontFamily: 'nau_searegular',
+            fontSize: '32px',
+            fill: '#FFF'
+        });
         this.scoreText.setDepth(5);
         this.score = 0;
 

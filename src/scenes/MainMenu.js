@@ -32,7 +32,7 @@ export class MainMenu extends Scene
         });
 
         this.input.keyboard.on('keydown-SPACE', () => {
-            this.scene.start('Game');
+            this.scene.start('HowToPlay');
         });
 
         this.sound.play('music', {loop: true});

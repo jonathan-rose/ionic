@@ -2,6 +2,7 @@ import { Boot } from './scenes/Boot';
 import { Game } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
 import { MainMenu } from './scenes/MainMenu';
+import { HowToPlay } from './scenes/HowToPlay';
 import { Preloader } from './scenes/Preloader';
 
 const config = {
@@ -23,6 +24,7 @@ const config = {
         Boot,
         Preloader,
         MainMenu,
+        HowToPlay,
         Game,
         GameOver
     ]

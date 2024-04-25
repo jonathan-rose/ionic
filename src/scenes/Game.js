@@ -128,6 +128,11 @@ export class Game extends Scene
         this.physics.add.overlap(this.player, this.healthShips, this.collectHealthShip, null, this);
 
         this.bigShips = this.physics.add.group();
+        this.anims.create({
+            key: 'bigShipExplosion',
+            frames: this.anims.generateFrameNumbers('bigShipExplosion', { start: 0, end: 6 }),
+            frameRate: 10
+        });
         this.physics.add.overlap(this.shieldSurface, this.bigShips, this.bigShipHitShield, this.outerShieldCollisionProcessor, this);
 
         // A group for the tendrils to interact with
@@ -334,7 +339,7 @@ export class Game extends Scene
         bigShip.shipType = 'big';
         bigShip.scoreValue = 100;
         bigShip.coreDamage = 200;
-        bigShip.deathAnim = 'explodeHealth';
+        bigShip.deathAnim = 'bigShipExplosion';
         this.bigShips.add(bigShip);
         this.physics.moveToObject(bigShip, this.core, 40);
     }
@@ -347,9 +352,7 @@ export class Game extends Scene
             healthbarCurrent = Math.max(0, healthbarCurrent - 100);
         }
 
-        // UPDATE EXPLOSION SPRITE
-
-        ship.anims.play('explodeHealth', true);
+        ship.anims.play('bigShipExplosion', true);
         ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
             ship.destroy();
         }, this);

@@ -58,6 +58,7 @@ export class Preloader extends Scene
         this.load.image('healthShip', 'healthShip.png');
         this.load.spritesheet('healthShipExplosion', 'healthShipExplosion.png', { frameWidth: 40, frameHeight: 40 });
         this.load.image('bigShip', 'bigShip.png');
+        this.load.spritesheet('bigShipExplosion', 'bigShipExplosion.png', { frameWidth: 60, frameHeight: 100 });
         this.load.image('bomb', 'bomb.png');
     }
 

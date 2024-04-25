@@ -243,12 +243,8 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
         this.tendrils.forEach((t) => {
             this.scene.tweens.add({
                 targets: t,
-                duration: 300,
-                onComplete: (tween, targets, field) => {
-                    field.isFiring = true;
-                    targets[0].radius = 700;
-                },
-                onCompleteParams: [this]
+                duration: 1800,
+                radius: 700
             });
         });
     }

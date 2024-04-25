@@ -62,7 +62,7 @@ export class Game extends Scene
 
         this.makeShapeMask(rectanglePowerbar, graphicsPowerbar);
 
-        this.powerbarMinimum = 100;
+        this.powerbarMinimum = 120;
         this.graphicsPowerbarMinimum = this.add.graphics ({ fillStyle: {color: 0xff0000, alpha: 0.7}});
         this.graphicsPowerbarMinimum.fillRect(
             this.powerbarForeground.getBottomLeft().x,

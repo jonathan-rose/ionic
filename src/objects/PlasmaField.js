@@ -33,9 +33,11 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
     }
 
     update() {
-        this.tendrils.forEach((t) => {
-            t.update();
-        });
+        if (!this.scene.gameEnding) {
+            this.tendrils.forEach((t) => {
+                t.update();
+            });
+        }
     }
 
     draw() {

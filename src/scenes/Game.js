@@ -16,14 +16,12 @@ var healthbarCurrent;
 var healthbarMax;
 var plasmaConsumeRate = 4;
 
-export class Game extends Scene
-{
-    constructor ()
-    {
+export class Game extends Scene {
+    constructor() {
         super('Game');
     }
 
-    create () {
+    create() {
         this.gameEnding = false;
 
         this.add.image(512, 384, 'background');
@@ -49,7 +47,7 @@ export class Game extends Scene
         this.healthbarForeground.setDepth(5);
 
         // Add power bar
-        graphicsPowerbar = this.add.graphics({ fillStyle: { color: 0x5557dd }}); // 0xdeb841
+        graphicsPowerbar = this.add.graphics({ fillStyle: { color: 0x5557dd } }); // 0xdeb841
         graphicsPowerbar.setDepth(4);
         rectanglePowerbar = new Phaser.Geom.Rectangle(
             this.powerbarForeground.getTopLeft().x,
@@ -63,7 +61,7 @@ export class Game extends Scene
         this.makeShapeMask(rectanglePowerbar, graphicsPowerbar);
 
         this.powerbarMinimum = 120;
-        this.graphicsPowerbarMinimum = this.add.graphics ({ fillStyle: {color: 0xff0000, alpha: 0.7}});
+        this.graphicsPowerbarMinimum = this.add.graphics({ fillStyle: { color: 0xff0000, alpha: 0.7 } });
         this.graphicsPowerbarMinimum.fillRect(
             this.powerbarForeground.getBottomLeft().x,
             this.powerbarForeground.getBottomLeft().y - this.powerbarMinimum,
@@ -75,7 +73,7 @@ export class Game extends Scene
         this.makeShapeMask(rectanglePowerbar, this.graphicsPowerbarMinimum);
 
         // Add Health bar
-        graphicsHealthbar = this.add.graphics({ fillStyle: { color: 0xe54489 }});
+        graphicsHealthbar = this.add.graphics({ fillStyle: { color: 0xe54489 } });
         graphicsHealthbar.setDepth(4);
         rectangleHealthbar = new Phaser.Geom.Rectangle(
             this.healthbarForeground.getTopLeft().x,
@@ -99,18 +97,18 @@ export class Game extends Scene
         this.shieldSurface.radius = 200; // I'm so sorry
 
         this.physics.add.overlap(this.shieldSurface, this.smallShips, this.smallShipHitShield, this.outerShieldCollisionProcessor, this);
-        
+
         this.shield = new Shield(
-            this, 
-            this.game.config.width / 2, 
+            this,
+            this.game.config.width / 2,
             this.game.config.height / 2,
             this.plasmaField.shieldRadius - 5
         );
 
         this.player = new Player(
-            this, 
+            this,
             this.shield.x,
-            this.shield.y, 
+            this.shield.y,
             'player',
             this.shield.height / 2,
             this.plasmaField,
@@ -143,10 +141,10 @@ export class Game extends Scene
         this.bomb2 = this.add.image(900, 50, 'bomb').setDepth(10);
         this.bomb3 = this.add.image(950, 50, 'bomb').setDepth(10);
         this.bombs = [this.bomb1, this.bomb2, this.bomb3];
-        
+
         this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-        this.enterKey.on('down', ()=> {
-            if (this.bombs.length > 0){
+        this.enterKey.on('down', () => {
+            if (this.bombs.length > 0) {
                 this.useBomb();
                 this.bombs.pop().destroy();
             }
@@ -175,7 +173,7 @@ export class Game extends Scene
         this.spawner = new EnemySpawnManager(this);
     }
 
-    update () {
+    update() {
         this.player.update(powerbarCurrent);
 
         // Currently constantly increases power and health
@@ -205,15 +203,14 @@ export class Game extends Scene
         graphicsHealthbar.fillRectShape(rectangleHealthbar);
 
         // End the game if health bar hits 0
-        if (healthbarCurrent <= 5){
+        if (healthbarCurrent <= 5) {
             this.registry.set('score', this.score);
             this.gameOverTransition();
         }
     }
 
-    makeShapeMask(rectangleBarType, graphicsType)
-    {
-        const shape = this.make.graphics({ fillStyle: { color: 0xffffff }});
+    makeShapeMask(rectangleBarType, graphicsType) {
+        const shape = this.make.graphics({ fillStyle: { color: 0xffffff } });
         shape.fillStyle(0xffffff);
         shape.beginPath();
         shape.fillRoundedRect(
@@ -221,7 +218,7 @@ export class Game extends Scene
             rectangleBarType.y,
             rectangleBarType.width,
             rectangleBarType.height,
-            this.powerbarForeground.width/2
+            this.powerbarForeground.width / 2
         );
         const mask = shape.createGeometryMask();
         graphicsType.setMask(mask);
@@ -247,19 +244,10 @@ export class Game extends Scene
         ship.setDepth(1);
         ship.spawnAngle = spawnAngle;
         ship.isDying = false;
-        if (sprite == 'healthShipExplosion') {
-            var healthParticles = this.add.particles(0, 0, 'healthSign', {
-                speed: 50,
-                scale: {start: 1, end: 0},
-                blendMode: 'ADD'
-            });
-            healthParticles.startFollow(ship);
-            ship.particles = healthParticles;
-        }
 
         // rotate to face centre
         const angleDeg = Math.atan2(this.circlePos.y - this.core.y, this.circlePos.x - this.core.x) * 180 / Math.PI;
-        ship.angle = angleDeg-90;
+        ship.angle = angleDeg - 90;
         this.destroyableShips.add(ship);
         return ship;
     }
@@ -274,8 +262,8 @@ export class Game extends Scene
         this.physics.moveToObject(smallShip, this.core, 50);
     }
 
-    smallShipHitShield(shield, ship){
-        if (!this.plasmaField.isFiringFullScreen){
+    smallShipHitShield(shield, ship) {
+        if (!this.plasmaField.isFiringFullScreen) {
             healthbarCurrent = Math.max(0, healthbarCurrent - 1.1);
         }
         ship.isDying = true;
@@ -319,13 +307,14 @@ export class Game extends Scene
         healthShip.shipType = 'health';
         healthShip.scoreValue = 0;
         healthShip.coreDamage = 20;
-        healthShip.deathAnim = 'explodeHealth'
+        healthShip.deathAnim = 'explodeHealth';
+        healthShip.preFX.addGlow(0x008000);
         healthShip.setDepth(2);
         this.healthShips.add(healthShip);
         this.physics.moveToObject(healthShip, this.core, 40);
     }
 
-    healthShipHitShield(shield, ship){
+    healthShipHitShield(shield, ship) {
         ship.body.velocity.x = 0;
         ship.body.velocity.y = 0;
         ship.isDying = true;
@@ -333,14 +322,24 @@ export class Game extends Scene
         ship.anims.play('explodeHealth', true);
         ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
             ship.destroy();
-            ship.particles.stop();
         }, this);
     }
 
-    collectHealthShip(player, ship){
-        if (healthbarCurrent < healthbarMax){
+    collectHealthShip(player, ship) {
+        if (healthbarCurrent < healthbarMax) {
             healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 300);
         }
+        var healthParticles = this.add.particles(ship.x, ship.y, 'healthSign', {
+            quantity: 5,
+            speed: { min: -100, max: 100 },
+            scale: { start: 0.5, end: 0 },
+            blendMode: 'ADD'
+        });
+        healthParticles.start();
+        this.time.delayedCall(1000, () => {
+            healthParticles.stop();
+            healthParticles.destroy();
+        })
         ship.destroy();
         // TODO: Add some nice animation or flurry of green/pink plusses
     }
@@ -356,11 +355,11 @@ export class Game extends Scene
         this.physics.moveToObject(bigShip, this.core, 40);
     }
 
-    bigShipHitShield(shield, ship){
+    bigShipHitShield(shield, ship) {
         ship.body.velocity.x = 0;
         ship.body.velocity.y = 0;
         ship.isDying = true;
-        if (!this.plasmaField.isFiringFullScreen){
+        if (!this.plasmaField.isFiringFullScreen) {
             healthbarCurrent = Math.max(0, healthbarCurrent - 100);
         }
 
@@ -370,7 +369,7 @@ export class Game extends Scene
         }, this);
     }
 
-    increaseScore(increase){
+    increaseScore(increase) {
         this.score += increase;
         this.scoreText.setText('Score: ' + this.score);
     }
@@ -385,7 +384,7 @@ export class Game extends Scene
                 targets[0].shieldRadius = 200;
             }
         });
-        
+
         this.plasmaField.fullScreenTendrilsOn();
         var screenWipeTimer = this.time.addEvent({
             delay: 2000,
@@ -402,16 +401,16 @@ export class Game extends Scene
             targets: this.shieldSurface,
             radius: 800,
             duration: 2000,
-            onComplete: (tween, targets) => {                
-                targets[0].body.x = 512-(200);
-                targets[0].body.y = 384-(200);
+            onComplete: (tween, targets) => {
+                targets[0].body.x = 512 - (200);
+                targets[0].body.y = 384 - (200);
                 targets[0].body.setCircle(200);
                 targets[0].radius = 200;
             },
             onUpdate: (tween, target, key, current) => {
                 target.body.setCircle(current);
-                target.body.x = 512-(current);
-                target.body.y = 384-(current);
+                target.body.x = 512 - (current);
+                target.body.y = 384 - (current);
             }
         });
     }
@@ -431,7 +430,7 @@ export class Game extends Scene
         // give the tendrils a sec to be big before freezing them.
         this.time.addEvent({
             delay: 300,
-            callback: () => {this.gameEnding = true;},
+            callback: () => { this.gameEnding = true; },
             callbackScope: this
         });
 
@@ -445,7 +444,7 @@ export class Game extends Scene
         let fadeOutTime = 3500;
         cam.fadeOut(fadeOutTime, 255, 255, 255);
 
-        let graphics = this.add.graphics({fillStyle: {color: 0xffffff}}).setDepth(100);
+        let graphics = this.add.graphics({ fillStyle: { color: 0xffffff } }).setDepth(100);
         let explosionDisc = new Phaser.Geom.Ellipse(512, 384, 0, 10);
         let explosionSphere = new Phaser.Geom.Circle(512, 384, 0);
 
@@ -476,7 +475,7 @@ export class Game extends Scene
 
         this.time.addEvent({
             delay: fadeOutTime,
-            callback: () => {this.scene.start('GameOver');},
+            callback: () => { this.scene.start('GameOver'); },
             callbackScope: this
         });
     }

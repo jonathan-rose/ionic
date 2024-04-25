@@ -241,6 +241,7 @@ export class Game extends Scene
         );
         ship.setDepth(1);
         ship.spawnAngle = spawnAngle;
+        ship.isDying = false;
 
         // rotate to face centre
         const angleDeg = Math.atan2(this.circlePos.y - this.core.y, this.circlePos.x - this.core.x) * 180 / Math.PI;
@@ -263,6 +264,7 @@ export class Game extends Scene
         if (!this.plasmaField.isFiringFullScreen){
             healthbarCurrent = Math.max(0, healthbarCurrent - 1.1);
         }
+        ship.isDying = true;
         ship.body.velocity.x = 0;
         ship.body.velocity.y = 0;
         ship.anims.play('explodeSmall', true);
@@ -311,6 +313,7 @@ export class Game extends Scene
     healthShipHitShield(shield, ship){
         ship.body.velocity.x = 0;
         ship.body.velocity.y = 0;
+        ship.isDying = true;
 
         ship.anims.play('explodeHealth', true);
         ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
@@ -339,6 +342,7 @@ export class Game extends Scene
     bigShipHitShield(shield, ship){
         ship.body.velocity.x = 0;
         ship.body.velocity.y = 0;
+        ship.isDying = true;
         if (!this.plasmaField.isFiringFullScreen){
             healthbarCurrent = Math.max(0, healthbarCurrent - 100);
         }
@@ -398,13 +402,16 @@ export class Game extends Scene
     }
 
     outerShieldCollisionProcessor(a, b) {
-        return this.plasmaField.isFiringFullScreen || !(this.plasmaField.isDepleted || this.plasmaField.isFiring);
+        return !b.isDying && (this.plasmaField.isFiringFullScreen || !(this.plasmaField.isDepleted || this.plasmaField.isFiring));
     }
 
     gameOverTransition() {
 
         this.sound.play('coreDeathExplosion');
-        this.plasmaField.fullScreenTendrilsOn();
+        this.plasmaField.tendrils.forEach((t) => {
+            t.radius = 700;
+        });
+        this.plasmaField.isFiringFullScreen = true;
 
         // give the tendrils a sec to be big before freezing them.
         this.time.addEvent({

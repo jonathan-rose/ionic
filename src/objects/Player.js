@@ -49,34 +49,28 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     update(powerbarCurrent) {
         this.powerbarCurrent = powerbarCurrent;
 
-        if (this.cooldownState == false) {
-            if (this.spaceKey.isDown && this.powerbarCurrent > 0 && this.depleted == false) {
-                this.isLanding = true;
-                this.setHover(0);
-                this.plasmaField.startFiring(
-                    Phaser.Math.RadToDeg(
-                        Phaser.Math.Angle.Between(
-                            512,
-                            383,
-                            this.x,
-                            this.y
-                        )
-                    ));
-            } else if (this.spaceKey.isUp || this.powerbarCurrent == 0 || this.powerbarCurrent < 0) {
-                this.isLanding = false;
-                this.setHover(this.defaultOrbitHoverDistance);
-                if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen) {
-                    this.plasmaField.stopFiring();
-                    this.plasmaField.isFiring = false;
-                }
+        if (this.spaceKey.isDown && !this.depleted) {
+            this.isLanding = true;
+            this.setHover(0);
+            this.plasmaField.startFiring(
+                Phaser.Math.RadToDeg(
+                    Phaser.Math.Angle.Between(
+                        512,
+                        383,
+                        this.x,
+                        this.y
+                    )
+                ));
+        } else if (this.spaceKey.isUp || this.powerbarCurrent <= 0) {
+            this.isLanding = false;
+            this.setHover(this.defaultOrbitHoverDistance);
+            if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen) {
+                this.plasmaField.stopFiring();
+                this.plasmaField.isFiring = false;
             }
         }
 
-        if (this.depleted == true) {
-            this.cooldownState = true;
-            this.cooldownTimer = this.scene.time.delayedCall(this.cooldownLength, () => {
-                this.cooldownState = false;
-            }, [], this);
+        if (this.depleted) {
             this.plasmaField.isDepleted = true;
 
             // turn off beam sound when running out of energy
@@ -89,7 +83,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             }
         }
 
-        if (this.cooldownState == true && this.flashRunning == false) {
+        // start flashing if we haven't already
+        if (this.depleted && !this.flashRunning) {
+            console.log("NOW");
             this.flashRunning = true;
             this.flashTimer = this.scene.time.addEvent({
                 delay: this.flashLength,
@@ -118,13 +114,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     toggleTint() {
-        if (this.cooldownState == true && this.powerbarCurrent < this.powerbarMinimum) {
+        // if we are below the minimum
+        if (this.depleted) {
+            // flash red and white
             if (this.scene.powerbarBackground.tintTopLeft === 0xffffff) {
                 this.scene.powerbarBackground.setTint(0xff0000);
             } else if (this.scene.powerbarBackground.tintTopLeft === 0xff0000) {
                 this.scene.powerbarBackground.setTint(0xffffff);
             }
-        } else if (this.cooldownState == false && this.powerbarCurrent >= this.powerbarMinimum) {
+        } else {
+            // remove flash timer
             this.flashTimer.remove();
             this.flashRunning = false;
             this.scene.powerbarBackground.clearTint();

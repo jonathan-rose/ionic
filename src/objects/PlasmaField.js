@@ -238,7 +238,6 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
     }
 
     fullScreenTendrilsOn(){
-        this.isFiring = true;
         this.isFiringFullScreen = true;
         this.tendrils.forEach((t) => {
             this.scene.tweens.add({
@@ -250,8 +249,10 @@ export default class PlasmaField extends Phaser.GameObjects.Container {
     }
 
     fullScreenTendrilsOff(){
+        this.isFiring = false;
         this.isFiringFullScreen = false;
-        this.startFiring(0); //only briefly so that stop firing will work. Sorry.
-        this.stopFiring();
+        this.tendrils.forEach((t) => {
+            t.radius = 200;
+        });
     }
 }

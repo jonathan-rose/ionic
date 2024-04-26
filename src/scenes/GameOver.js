@@ -11,10 +11,10 @@ export class GameOver extends Scene
     {
         this.add.image(512, 384, 'background');
 
-        this.score = this.registry.get('score');
-
-        if (this.score > this.registry.get('highscore')){
-            this.registry.set('highscore', this.score);
+        let score = this.registry.get('score');
+        let highscore = this.registry.get('highscore');
+        if (score > highscore){
+            this.registry.set('highscore', score);
             this.text1 = this.add.text(512, 200, 'New High Score!', {
                 fontFamily: 'nau_searegular',
                 fontSize: 38,
@@ -34,7 +34,7 @@ export class GameOver extends Scene
             align: 'center'
         }).setOrigin(0.5);
 
-        this.text3 = this.add.text(512, 350, this.score, {
+        this.text3 = this.add.text(512, 350, score, {
             fontFamily: 'nau_searegular',
             fontSize: 38,
             color: '#ffffff',

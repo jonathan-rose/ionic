@@ -150,12 +150,6 @@ export class Game extends Scene {
             }
         });
 
-        // @NOTE debugging key event to end the game
-        // this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-        // this.rKey.on('down', ()=> {
-        //     this.gameOverTransition();
-        // });
-
         this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.destroyableShips, this.hitTendril, this.plasmaField.collisionProcessor, this);
 
         this.coreCollider = this.physics.add.overlap(this.core, this.destroyableShips, this.hitCore, null, this);
@@ -171,6 +165,12 @@ export class Game extends Scene {
 
         // Manage ramping difficulty and stuff
         this.spawner = new EnemySpawnManager(this);
+
+        // // @NOTE debugging key event to end the game
+        // this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+        // this.rKey.on('down', ()=> {
+        //     this.gameOverTransition();
+        // });
     }
 
     update() {
@@ -204,7 +204,6 @@ export class Game extends Scene {
 
         // End the game if health bar hits 0
         if (healthbarCurrent <= 5) {
-            this.registry.set('score', this.score);
             this.gameOverTransition();
         }
     }
@@ -298,17 +297,20 @@ export class Game extends Scene {
                 this.cameras.main.shake(200, 0.03);
                 break;
         }
-        // @TODO: animate ship death?
-        ship.destroy();
+        ship.body.velocity.x = 0;
+        ship.body.velocity.y = 0;
+        ship.anims.play(ship.deathAnim, true);
+        ship.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
+            ship.destroy();
+        }, this);
     }
 
     addHealthShip() {
-        var healthShip = this.addShip('healthShipExplosion');
+        var healthShip = this.addShip('healthShip');
         healthShip.shipType = 'health';
         healthShip.scoreValue = 0;
         healthShip.coreDamage = 20;
         healthShip.deathAnim = 'explodeHealth';
-        healthShip.preFX.addGlow(0x008000);
         healthShip.setDepth(2);
         this.healthShips.add(healthShip);
         this.physics.moveToObject(healthShip, this.core, 40);
@@ -330,18 +332,17 @@ export class Game extends Scene {
             healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 300);
         }
         var healthParticles = this.add.particles(ship.x, ship.y, 'healthSign', {
-            quantity: 5,
+            quantity: 2,
             speed: { min: -100, max: 100 },
             scale: { start: 0.5, end: 0 },
             blendMode: 'ADD'
         });
         healthParticles.start();
-        this.time.delayedCall(1000, () => {
+        this.time.delayedCall(400, () => {
             healthParticles.stop();
             healthParticles.destroy();
-        })
+        });
         ship.destroy();
-        // TODO: Add some nice animation or flurry of green/pink plusses
     }
 
     addBigShip() {
@@ -386,7 +387,7 @@ export class Game extends Scene {
         });
 
         this.plasmaField.fullScreenTendrilsOn();
-        var screenWipeTimer = this.time.addEvent({
+        this.time.addEvent({
             delay: 2000,
             callback: this.plasmaField.fullScreenTendrilsOff,
             callbackScope: this.plasmaField,
@@ -420,6 +421,7 @@ export class Game extends Scene {
     }
 
     gameOverTransition() {
+        this.registry.set('score', this.score);
 
         this.sound.play('coreDeathExplosion');
         this.plasmaField.tendrils.forEach((t) => {
@@ -438,6 +440,7 @@ export class Game extends Scene {
         this.destroyableShips.children.getArray().forEach((s) => {
             s.body.velocity.x = 0;
             s.body.velocity.y = 0;
+            s.anims.pause();
         });
 
         let cam = this.cameras.main;

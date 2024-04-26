@@ -49,7 +49,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     update(powerbarCurrent) {
         this.powerbarCurrent = powerbarCurrent;
 
-        if (this.spaceKey.isDown && !this.depleted) {
+        if (this.spaceKey.isDown && !this.depleted && !this.plasmaField.isFiringFullScreen) {
             this.isLanding = true;
             this.setHover(0);
             this.plasmaField.startFiring(
@@ -60,13 +60,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                         this.x,
                         this.y
                     )
-                ));
+                )
+            );
         } else if (this.spaceKey.isUp || this.powerbarCurrent <= 0) {
             this.isLanding = false;
             this.setHover(this.defaultOrbitHoverDistance);
             if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen) {
                 this.plasmaField.stopFiring();
-                this.plasmaField.isFiring = false;
             }
         }
 
@@ -85,7 +85,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // start flashing if we haven't already
         if (this.depleted && !this.flashRunning) {
-            console.log("NOW");
             this.flashRunning = true;
             this.flashTimer = this.scene.time.addEvent({
                 delay: this.flashLength,

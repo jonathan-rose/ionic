@@ -46,9 +46,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.y = this.center.y + this.orbitDistance * Math.sin(Phaser.Math.DegToRad(this.currentAngle));
     }
 
-    update(powerbarCurrent) {
-        this.powerbarCurrent = powerbarCurrent;
-
+    update() {
         if (this.spaceKey.isDown && !this.depleted && !this.plasmaField.isFiringFullScreen) {
             this.isLanding = true;
             this.setHover(0);
@@ -62,7 +60,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                     )
                 )
             );
-        } else if (this.spaceKey.isUp || this.powerbarCurrent <= 0) {
+        } else if (this.spaceKey.isUp || this.scene.powerbarCurrent <= 0) {
             this.isLanding = false;
             this.setHover(this.defaultOrbitHoverDistance);
             if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen) {
@@ -94,9 +92,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             });
         }
 
-        if (this.powerbarCurrent <= 0) {
+        if (this.scene.powerbarCurrent <= 0) {
             this.depleted = true;
-        } else if (this.powerbarCurrent >= this.powerbarMinimum) {
+        } else if (this.scene.powerbarCurrent >= this.powerbarMinimum) {
             this.depleted = false;
             this.plasmaField.isDepleted = false;
         }

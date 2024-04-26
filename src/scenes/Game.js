@@ -8,7 +8,6 @@ import Util from '../util.js';
 var keys;
 var rectanglePowerbar;
 var graphicsPowerbar;
-var powerbarCurrent;
 var powerbarMax;
 var graphicsHealthbar;
 var rectangleHealthbar;
@@ -55,7 +54,7 @@ export class Game extends Scene {
             this.powerbarForeground.width,
             this.powerbarForeground.height
         );
-        powerbarCurrent = 600;
+        this.powerbarCurrent = 600;
         powerbarMax = 600;
 
         this.makeShapeMask(rectanglePowerbar, graphicsPowerbar);
@@ -150,6 +149,16 @@ export class Game extends Scene {
             }
         });
 
+        // hotfix to stop tapping space from being so effective
+        this.spaceTapped = false;
+        this.spaceTappedCounterThreshhold = 10;
+        this.spaceTappedCounter = this.spaceTappedCounterThreshhold;
+        this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.spaceKey.on('down', () => {
+            this.spaceTapped = true;
+            this.spaceTappedCounter = 0;
+        });
+
         this.tendrilCollider = this.physics.add.overlap(this.plasmaField, this.destroyableShips, this.hitTendril, this.plasmaField.collisionProcessor, this);
 
         this.coreCollider = this.physics.add.overlap(this.core, this.destroyableShips, this.hitCore, null, this);
@@ -174,18 +183,19 @@ export class Game extends Scene {
     }
 
     update() {
-        this.player.update(powerbarCurrent);
+        this.player.update();
 
         // Currently constantly increases power and health
-        if (powerbarCurrent < powerbarMax && !this.gameEnding) {
-            powerbarCurrent = Math.min(powerbarMax, powerbarCurrent + 1);
+        if (this.powerbarCurrent < powerbarMax && !this.gameEnding) {
+            this.powerbarCurrent = Math.min(powerbarMax, this.powerbarCurrent + 1);
         }
         if (healthbarCurrent < healthbarMax && !this.gameEnding) {
             healthbarCurrent = Math.min(healthbarMax, healthbarCurrent + 0.3);
         }
 
-        if (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen && !this.gameEnding) {
-            powerbarCurrent = Math.max(0, powerbarCurrent - plasmaConsumeRate);
+        this.spaceTappedCounter++;
+        if (this.spaceTappedCounter < this.spaceTappedCounterThreshhold || (this.plasmaField.isFiring && !this.plasmaField.isFiringFullScreen && !this.gameEnding)) {
+            this.powerbarCurrent = Math.max(0, this.powerbarCurrent - plasmaConsumeRate);
         }
 
         this.plasmaField.update();
@@ -193,8 +203,8 @@ export class Game extends Scene {
 
         // update powerbar and healthbar
         graphicsPowerbar.clear();
-        rectanglePowerbar.setSize(this.powerbarForeground.width, powerbarCurrent);
-        rectanglePowerbar.y = this.powerbarForeground.getBottomLeft().y - powerbarCurrent;
+        rectanglePowerbar.setSize(this.powerbarForeground.width, this.powerbarCurrent);
+        rectanglePowerbar.y = this.powerbarForeground.getBottomLeft().y - this.powerbarCurrent;
         graphicsPowerbar.fillRectShape(rectanglePowerbar);
 
         graphicsHealthbar.clear();
